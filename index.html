@@ -28,7 +28,13 @@
   .nav-left a, .nav-right a { color: var(--ink); text-decoration: none; }
   .nav-left a:hover, .nav-right a:hover { color: var(--accent); }
   .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 24px; letter-spacing: 0.06em; }
-  .list { margin-top: 32px; }
+  .list {
+    margin-top: 32px;
+    max-height: calc(100vh - 260px);
+    max-height: calc(100dvh - 260px);
+    overflow-y: auto;
+    padding-right: 8px;
+  }
   .list-item {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
@@ -38,6 +44,37 @@
   }
   .list-item.dim { color: rgba(43, 33, 24, 0.35); }
   .list-item .idx { display: inline-block; width: 60px; }
+  .list-item-header {
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+  .list-item-header:hover,
+  .list-item-header:focus-visible {
+    color: var(--accent);
+    outline: none;
+  }
+  .list-item.expanded .list-item-header {
+    color: var(--accent);
+  }
+  .list-item-body {
+    max-height: 0;
+    overflow: hidden;
+    padding-left: 60px;
+    transition: max-height 0.35s ease;
+  }
+  .list-item.expanded .list-item-body {
+    max-height: 220px;
+  }
+  .list-item-body p {
+    margin: 14px 0 22px;
+    max-width: 640px;
+    font-family: 'EB Garamond', serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
   footer {
     position: absolute; bottom: 40px; left: 64px; right: 64px;
     display: flex; justify-content: space-between; align-items: center;
@@ -63,14 +100,38 @@
     </nav>
 
     <div class="list">
-      <div class="list-item"><span class="idx">00.</span>Placeholder heading</div>
-      <div class="list-item"><span class="idx">01.</span>Placeholder heading text here</div>
-      <div class="list-item"><span class="idx">02.</span>Placeholder heading</div>
-      <div class="list-item"><span class="idx">03.</span>Placeholder heading</div>
-      <div class="list-item"><span class="idx">04.</span>Placeholder heading</div>
-      <div class="list-item"><span class="idx">05.</span>Placeholder heading text</div>
-      <div class="list-item dim"><span class="idx">06.</span>Placeholder heading</div>
-      <div class="list-item dim"><span class="idx">07.</span>Placeholder heading</div>
+      <div class="list-item">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">00.</span>Placeholder heading</div>
+        <div class="list-item-body"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p></div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">01.</span>Placeholder heading text here</div>
+        <div class="list-item-body"><p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p></div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">02.</span>Placeholder heading</div>
+        <div class="list-item-body"><p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p></div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">03.</span>Placeholder heading</div>
+        <div class="list-item-body"><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum.</p></div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">04.</span>Placeholder heading</div>
+        <div class="list-item-body"><p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse.</p></div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">05.</span>Placeholder heading text</div>
+        <div class="list-item-body"><p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p></div>
+      </div>
+      <div class="list-item dim">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">06.</span>Placeholder heading</div>
+        <div class="list-item-body"><p>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus.</p></div>
+      </div>
+      <div class="list-item dim">
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">07.</span>Placeholder heading</div>
+        <div class="list-item-body"><p>Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus.</p></div>
+      </div>
     </div>
 
     <footer>
@@ -88,6 +149,33 @@
       <div class="mark"></div>
     </footer>
   </main>
+
+  <script>
+    document.querySelectorAll('.list-item-header').forEach(function (header) {
+      header.addEventListener('click', function () { toggleItem(header); });
+      header.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleItem(header);
+        }
+      });
+    });
+
+    function toggleItem(header) {
+      var item = header.closest('.list-item');
+      var wasExpanded = item.classList.contains('expanded');
+
+      document.querySelectorAll('.list-item.expanded').forEach(function (openItem) {
+        openItem.classList.remove('expanded');
+        openItem.querySelector('.list-item-header').setAttribute('aria-expanded', 'false');
+      });
+
+      if (!wasExpanded) {
+        item.classList.add('expanded');
+        header.setAttribute('aria-expanded', 'true');
+      }
+    }
+  </script>
 </body>
 </html>
 
