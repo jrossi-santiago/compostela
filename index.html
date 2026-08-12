@@ -81,6 +81,15 @@
     line-height: 1.55;
     color: var(--ink-soft);
   }
+  .list-item-body p a {
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+  }
+  .list-item-body p a:hover {
+    color: var(--accent-hover);
+  }
   footer {
     position: absolute; bottom: 40px; left: 64px; right: 64px;
     display: flex; justify-content: space-between; align-items: center;
@@ -107,8 +116,8 @@
 
     <div class="list">
       <div class="list-item">
-        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">00.</span>Placeholder heading</div>
-        <div class="list-item-body"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p></div>
+        <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">00.</span>Start Here</div>
+        <div class="list-item-body"><p>All of our writing is hosted and published on <a href="https://compostela.substack.com" target="_blank" rel="noopener">Substack</a>.</p></div>
       </div>
       <div class="list-item">
         <div class="list-item-header" role="button" tabindex="0" aria-expanded="false"><span class="idx">01.</span>Placeholder heading text here</div>
