@@ -101,20 +101,19 @@
   .mark { height: 48px; width: auto; display: block; }
   .toast {
     position: fixed;
-    bottom: 110px;
-    left: 50%;
-    transform: translate(-50%, 12px);
-    background: var(--accent);
-    color: var(--bg);
+    left: 0;
+    top: 0;
+    transform: translate(-50%, 2px);
+    color: var(--ink-soft);
     font-family: 'EB Garamond', serif;
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 13px;
     letter-spacing: 0.02em;
-    padding: 12px 22px;
-    border-radius: 4px;
+    white-space: nowrap;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 100;
   }
   .toast.show {
@@ -210,6 +209,9 @@
       link.addEventListener('click', function (e) {
         e.preventDefault();
         clearTimeout(toastTimeout);
+        var rect = link.getBoundingClientRect();
+        toast.style.left = (rect.left + rect.width / 2) + 'px';
+        toast.style.top = (rect.bottom + 6) + 'px';
         toast.classList.add('show');
         toastTimeout = setTimeout(function () {
           toast.classList.remove('show');
