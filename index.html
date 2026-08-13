@@ -24,11 +24,25 @@
     overflow: hidden;
   }
   .page { position: relative; width: 100%; height: 100vh; height: 100dvh; padding: 32px 64px; }
-  nav { display: flex; justify-content: space-between; align-items: center; font-family: 'EB Garamond', serif; font-weight: 500; }
+  nav { position: relative; display: flex; justify-content: space-between; align-items: center; font-family: 'EB Garamond', serif; font-weight: 500; }
   .nav-left { display: flex; gap: 32px; font-size: 17px; }
   .nav-left a, .nav-right a { color: var(--ink); text-decoration: none; }
   .nav-left a:hover, .nav-right a:hover { color: var(--accent); }
   .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 24px; letter-spacing: 0.06em; }
+  .nav-mark { display: none; height: 36px; width: auto; }
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--ink); }
   .list {
     margin-top: 32px;
     max-height: calc(100vh - 260px);
@@ -120,12 +134,47 @@
     opacity: 1;
     transform: translate(-50%, 0);
   }
+
+  @media (max-width: 640px) {
+    .page { padding: 20px; }
+    .nav-mark { display: block; }
+    .wordmark { display: none; }
+    .hamburger { display: flex; }
+    .nav-left {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      flex-direction: column;
+      gap: 0;
+      min-width: 180px;
+      padding: 8px 20px;
+      background: var(--bg);
+      border: 1px solid rgba(43, 33, 24, 0.15);
+      border-radius: 4px;
+      z-index: 50;
+    }
+    .nav-left.open { display: flex; }
+    .nav-left a { padding: 12px 0; font-size: 18px; border-bottom: 1px solid rgba(43, 33, 24, 0.1); }
+    .nav-left a:last-child { border-bottom: none; }
+
+    .list { margin-top: 20px; max-height: calc(100vh - 170px); max-height: calc(100dvh - 170px); }
+    .list-item { font-size: clamp(16px, 5.2vw, 21px); }
+    .list-item .idx { width: 34px; }
+    .list-item-header { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-item-body { padding-left: 34px; }
+    .list-item-body p { font-size: 14px; margin: 8px 0 16px; }
+
+    footer { bottom: 20px; left: 20px; right: 20px; }
+    footer .mark { display: none; }
+  }
 </style>
 </head>
 <body>
   <main class="page">
     <nav>
-      <div class="nav-left">
+      <img class="nav-mark" src="logo.png" alt="Compostela logo">
+      <div class="nav-left" id="navLeft">
         <a href="#">Shop Gallery</a>
         <a href="#">Journaling</a>
         <a href="#">Daily Prayer</a>
@@ -133,6 +182,9 @@
         <a href="#">Development</a>
       </div>
       <div class="wordmark">Compostela</div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-expanded="false" aria-controls="navLeft">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
 
     
@@ -196,11 +248,30 @@
   <script>
     var toast = document.getElementById('toast');
     var toastTimeout;
+    var hamburgerBtn = document.getElementById('hamburgerBtn');
+    var navLeft = document.getElementById('navLeft');
+
+    function closeMenu() {
+      navLeft.classList.remove('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    hamburgerBtn.addEventListener('click', function () {
+      var isOpen = navLeft.classList.toggle('open');
+      hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (navLeft.classList.contains('open') && !navLeft.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+        closeMenu();
+      }
+    });
 
     document.querySelectorAll('.nav-left a, .footer-left a').forEach(function (link) {
       link.addEventListener('click', function (e) {
         e.preventDefault();
         clearTimeout(toastTimeout);
+        closeMenu();
         var rect = link.getBoundingClientRect();
         toast.style.left = (rect.left + rect.width / 2) + 'px';
         toast.style.top = (rect.bottom + 6) + 'px';
