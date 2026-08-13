@@ -236,6 +236,7 @@
   </div>
 
   <script src="assets/catalog.js"></script>
+  <script src="assets/pricing.js"></script>
   <script src="assets/shop.js"></script>
   <script>
     (function () {
@@ -259,6 +260,15 @@
       document.title = work.title + ' — Compostela';
       var metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc) metaDesc.setAttribute('content', work.blurb);
+
+      // Shipping, returns and print specs are authored once in catalog.js.
+      var policies = Shop.catalog.policies;
+
+      function paragraphs(list) {
+        return list.map(function (text) {
+          return '<p>' + Shop.escapeHTML(text) + '</p>';
+        }).join('');
+      }
 
       var sizes = Shop.availableSizes(work);
       var firstInStock = sizes.filter(function (s) { return !Shop.isSizeSoldOut(work, s.id); })[0];
@@ -373,15 +383,13 @@
 
             '<div class="accordions">' +
               '<details open><summary>Details &amp; framing</summary>' +
-                '<p>' + Shop.escapeHTML(work.details) + '</p>' +
-                '<p>Frames are made to the print&rsquo;s dimensions in gilded oak or dark walnut, glazed with UV-filtering acrylic and delivered wired and ready to hang.</p>' +
+                paragraphs([Shop.detailsFor(work), policies.framing]) +
               '</details>' +
               '<details><summary>Shipping</summary>' +
-                '<p>Prints are made when you order, so allow three to five working days before dispatch. Unframed prints ship rolled in a rigid tube; framed pieces ship boxed and corner-protected.</p>' +
-                '<p>Domestic delivery runs two to five days after dispatch. International orders are sent tracked; any duties are the recipient&rsquo;s.</p>' +
+                paragraphs(policies.shipping) +
               '</details>' +
               '<details><summary>Returns</summary>' +
-                '<p>If a piece arrives damaged or is not what you expected, write to us within thirty days and we will replace it or refund it. Framed pieces should be returned in their original packing.</p>' +
+                paragraphs(policies.returns) +
               '</details>' +
             '</div>' +
 
@@ -410,7 +418,7 @@
         addBtn.textContent = soldOut ? 'Sold out in this size' : 'Add to basket';
         stockLine.textContent = soldOut
           ? 'This size has sold out. Another size may still be available.'
-          : 'In stock — printed and dispatched within three to five working days.';
+          : policies.stockNote;
       }
 
       sizeSelect.addEventListener('change', function () { state.sizeId = sizeSelect.value; sync(); });

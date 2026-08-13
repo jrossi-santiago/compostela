@@ -1,0 +1,9 @@
+{
+  "name": "compostela",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Compostela — a Catholic press. Static site with a Stripe checkout function.",
+  "dependencies": {
+    "stripe": "^17.5.0"
+  }
+}

@@ -1,29 +1,22 @@
 /* Compostela — shop runtime.
  *
- * Everything the gallery and product pages share: money formatting, the
- * artwork plate (with a graceful fallback until real image files land),
- * the cart store, and the cart drawer.
+ * The browser half: the artwork plate, the basket, the drawer, and the hand-
+ * off to Stripe. All pricing is delegated to assets/pricing.js, which the
+ * checkout function also uses, so there is exactly one implementation of
+ * "what does this cost".
  *
- * The cart lives in localStorage only. Line items store identifiers, never
- * prices — totals are always recomputed from the catalog, so a price change
- * can never be carried in a stale basket.
+ * The basket lives in localStorage and stores identifiers only — never
+ * prices. Totals are recomputed from the catalog on every render, so a
+ * basket left open across a price change cannot carry a stale amount, and
+ * the server recomputes them again before charging anything.
  */
 window.Shop = (function () {
   var CART_KEY = 'compostela.cart.v1';
-  var catalog = window.COMPOSTELA_CATALOG;
+  var pricing = window.COMPOSTELA_PRICING;
+  var catalog = pricing.catalog;
   var listeners = [];
   var cart = [];
   var toastTimer;
-
-  /* ---------- helpers ---------- */
-
-  function money(cents) {
-    var dollars = cents / 100;
-    return '$' + dollars.toLocaleString('en-US', {
-      minimumFractionDigits: dollars % 1 === 0 ? 0 : 2,
-      maximumFractionDigits: 2
-    });
-  }
 
   function escapeHTML(value) {
     return String(value)
@@ -34,66 +27,11 @@ window.Shop = (function () {
       .replace(/'/g, '&#39;');
   }
 
-  function workBySlug(slug) {
-    for (var i = 0; i < catalog.works.length; i++) {
-      if (catalog.works[i].slug === slug) return catalog.works[i];
-    }
-    return null;
-  }
-
-  function byId(list, id) {
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].id === id) return list[i];
-    }
-    return null;
-  }
-
-  function sizeById(id) { return byId(catalog.sizes, id); }
-  function frameById(id) { return byId(catalog.frames, id); }
-
-  function collectionLabel(id) {
-    var found = byId(catalog.collections, id);
-    return found ? found.label : '';
-  }
-
-  function isSizeSoldOut(work, sizeId) {
-    return !!(work.soldOut && work.soldOut.indexOf(sizeId) !== -1);
-  }
-
-  function availableSizes(work) {
-    return catalog.sizes.filter(function (size) {
-      return work.prices[size.id] != null;
-    });
-  }
-
-  function isSoldOut(work) {
-    return availableSizes(work).every(function (size) {
-      return isSizeSoldOut(work, size.id);
-    });
-  }
-
-  function priceFrom(work) {
-    var prices = availableSizes(work)
-      .filter(function (size) { return !isSizeSoldOut(work, size.id); })
-      .map(function (size) { return work.prices[size.id]; });
-    if (!prices.length) {
-      prices = availableSizes(work).map(function (size) { return work.prices[size.id]; });
-    }
-    return Math.min.apply(null, prices);
-  }
-
-  function linePrice(item) {
-    var work = workBySlug(item.slug);
-    var frame = frameById(item.frameId);
-    if (!work || work.prices[item.sizeId] == null) return null;
-    return work.prices[item.sizeId] + (frame ? frame.price : 0);
-  }
-
   function imageSrc(work) {
     return 'assets/art/' + work.slug + '.jpg';
   }
 
-  /* Renders the framed image plate. Falls back to a labelled placeholder
+  /* Renders the matted image plate. Falls back to a labelled placeholder
      when the image file is not in assets/art/ yet. */
   function plateHTML(work, options) {
     options = options || {};
@@ -122,8 +60,9 @@ window.Shop = (function () {
       var raw = window.localStorage.getItem(CART_KEY);
       var parsed = raw ? JSON.parse(raw) : [];
       if (!Array.isArray(parsed)) return [];
+      // Drop anything the catalog no longer sells.
       return parsed.filter(function (item) {
-        return item && workBySlug(item.slug) && linePrice(item) != null && item.qty > 0;
+        return pricing.resolveLine(item).ok;
       });
     } catch (err) {
       return [];
@@ -145,21 +84,25 @@ window.Shop = (function () {
   }
 
   function addToCart(entry) {
+    var line = pricing.resolveLine(entry);
+    if (!line.ok) { toast(line.error); return false; }
+
     var existing = null;
     for (var i = 0; i < cart.length; i++) {
       if (lineKey(cart[i]) === lineKey(entry)) { existing = cart[i]; break; }
     }
     if (existing) {
-      existing.qty = Math.min(existing.qty + (entry.qty || 1), 20);
+      existing.qty = Math.min(existing.qty + line.qty, pricing.MAX_QTY);
     } else {
       cart.push({
         slug: entry.slug,
         sizeId: entry.sizeId,
         frameId: entry.frameId,
-        qty: Math.min(entry.qty || 1, 20)
+        qty: line.qty
       });
     }
     writeCart();
+    return true;
   }
 
   function setQty(index, qty) {
@@ -167,19 +110,18 @@ window.Shop = (function () {
     if (qty < 1) {
       cart.splice(index, 1);
     } else {
-      cart[index].qty = Math.min(qty, 20);
+      cart[index].qty = Math.min(qty, pricing.MAX_QTY);
     }
+    writeCart();
+  }
+
+  function clearCart() {
+    cart = [];
     writeCart();
   }
 
   function count() {
     return cart.reduce(function (sum, item) { return sum + item.qty; }, 0);
-  }
-
-  function subtotal() {
-    return cart.reduce(function (sum, item) {
-      return sum + (linePrice(item) || 0) * item.qty;
-    }, 0);
   }
 
   /* ---------- chrome ---------- */
@@ -190,7 +132,7 @@ window.Shop = (function () {
     el.textContent = message;
     el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2400);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 3200);
   }
 
   function injectChrome() {
@@ -206,7 +148,7 @@ window.Shop = (function () {
       '  <footer class="drawer__foot">',
       '    <div class="drawer__row"><span class="eyebrow">Subtotal</span>',
       '      <span class="display" style="font-size:22px" id="cartSubtotal">$0</span></div>',
-      '    <p class="drawer__note">Shipping and any duties are calculated at checkout.</p>',
+      '    <p class="drawer__note">Shipping is calculated at the next step.</p>',
       '    <button class="btn btn--block" type="button" id="cartCheckout">Proceed to checkout</button>',
       '  </footer>',
       '</aside>',
@@ -219,32 +161,33 @@ window.Shop = (function () {
     var body = document.getElementById('cartBody');
     if (!body) return;
 
+    var basket = pricing.resolveCart(cart);
+
     if (!cart.length) {
       body.innerHTML = '<p class="drawer__empty">Your basket is empty.</p>';
     } else {
-      body.innerHTML = cart.map(function (item, index) {
-        var work = workBySlug(item.slug);
-        var size = sizeById(item.sizeId);
-        var frame = frameById(item.frameId);
-        var price = linePrice(item);
+      body.innerHTML = basket.lines.map(function (line, index) {
+        var href = 'product.html?work=' + encodeURIComponent(line.work.slug);
         return (
           '<div class="cart-line">' +
-            '<a href="product.html?work=' + encodeURIComponent(work.slug) + '" class="cart-line__plate">' +
-              plateHTML(work, { ratio: '3 / 4' }) +
+            '<a href="' + href + '" class="cart-line__plate">' +
+              plateHTML(line.work, { ratio: '3 / 4' }) +
             '</a>' +
             '<div>' +
-              '<a href="product.html?work=' + encodeURIComponent(work.slug) + '" style="text-decoration:none">' +
-                '<span class="cart-line__title">' + escapeHTML(work.title) + '</span>' +
+              '<a href="' + href + '" style="text-decoration:none">' +
+                '<span class="cart-line__title">' + escapeHTML(line.work.title) + '</span>' +
               '</a>' +
-              '<div class="cart-line__meta">' + escapeHTML(size.label) + ' · ' + escapeHTML(size.dimensions) + '<br>' +
-                escapeHTML(frame.label) + '</div>' +
+              '<div class="cart-line__meta">' +
+                escapeHTML(line.size.label) + ' · ' + escapeHTML(line.size.dimensions) + '<br>' +
+                escapeHTML(line.frame.label) +
+              '</div>' +
               '<div class="cart-line__foot">' +
                 '<span class="qty">' +
                   '<button type="button" data-qty="-1" data-index="' + index + '" aria-label="Decrease quantity">&minus;</button>' +
-                  '<span>' + item.qty + '</span>' +
+                  '<span>' + line.qty + '</span>' +
                   '<button type="button" data-qty="1" data-index="' + index + '" aria-label="Increase quantity">+</button>' +
                 '</span>' +
-                '<span>' + money(price * item.qty) + '</span>' +
+                '<span>' + pricing.money(line.total) + '</span>' +
               '</div>' +
               '<button class="cart-line__remove" type="button" data-remove="' + index + '">Remove</button>' +
             '</div>' +
@@ -253,7 +196,7 @@ window.Shop = (function () {
       }).join('');
     }
 
-    document.getElementById('cartSubtotal').textContent = money(subtotal());
+    document.getElementById('cartSubtotal').textContent = pricing.money(basket.total);
     document.getElementById('cartCheckout').disabled = !cart.length;
   }
 
@@ -292,6 +235,45 @@ window.Shop = (function () {
     }, 300);
   }
 
+  /* Hands the basket to /api/checkout, which prices it again server-side and
+     returns a Stripe Checkout URL to redirect to. */
+  function checkout() {
+    var button = document.getElementById('cartCheckout');
+    if (!cart.length || button.disabled) return;
+
+    button.disabled = true;
+    button.textContent = 'Taking you to checkout…';
+
+    function recover(message) {
+      button.disabled = false;
+      button.textContent = 'Proceed to checkout';
+      toast(message);
+    }
+
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart })
+    })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { status: response.status, data: data };
+        });
+      })
+      .then(function (result) {
+        if (result.data && result.data.url) {
+          window.location.href = result.data.url;
+          return;
+        }
+        recover(result.data && result.data.error
+          ? result.data.error
+          : 'Checkout is unavailable right now.');
+      })
+      .catch(function () {
+        recover('Could not reach checkout. Check your connection and try again.');
+      });
+  }
+
   function wireChrome() {
     document.getElementById('cartScrim').addEventListener('click', closeCart);
     document.getElementById('cartClose').addEventListener('click', closeCart);
@@ -317,11 +299,7 @@ window.Shop = (function () {
       }
     });
 
-    // No payment processor is wired up yet. When one is, this is the hook:
-    // build the line items from `cart` and hand them to the checkout session.
-    document.getElementById('cartCheckout').addEventListener('click', function () {
-      toast('Checkout opens soon — write to us to reserve a piece.');
-    });
+    document.getElementById('cartCheckout').addEventListener('click', checkout);
 
     var hamburger = document.getElementById('navToggle');
     var nav = document.getElementById('siteNav');
@@ -361,19 +339,23 @@ window.Shop = (function () {
   return {
     catalog: catalog,
     init: init,
-    money: money,
     escapeHTML: escapeHTML,
-    workBySlug: workBySlug,
-    sizeById: sizeById,
-    frameById: frameById,
-    collectionLabel: collectionLabel,
-    availableSizes: availableSizes,
-    isSizeSoldOut: isSizeSoldOut,
-    isSoldOut: isSoldOut,
-    priceFrom: priceFrom,
+    // Pricing is re-exported so pages have one object to talk to.
+    money: pricing.money,
+    workBySlug: pricing.workBySlug,
+    sizeById: pricing.sizeById,
+    frameById: pricing.frameById,
+    collectionLabel: pricing.collectionLabel,
+    availableSizes: pricing.availableSizes,
+    isSizeSoldOut: pricing.isSizeSoldOut,
+    isSoldOut: pricing.isSoldOut,
+    priceFrom: pricing.priceFrom,
+    detailsFor: pricing.detailsFor,
+    resolveLine: pricing.resolveLine,
     plateHTML: plateHTML,
     plateFallback: plateFallback,
     addToCart: addToCart,
+    clearCart: clearCart,
     openCart: openCart,
     closeCart: closeCart,
     toast: toast

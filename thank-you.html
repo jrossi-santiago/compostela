@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank you — Compostela</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .thanks { padding: 110px 0 40px; max-width: 640px; }
+  .thanks h1 { font-size: clamp(38px, 5.4vw, 62px); margin: 14px 0 22px; }
+  .thanks p { color: var(--ink-soft); }
+  .thanks .btn { margin-top: 34px; }
+  .rule { margin: 44px 0 0; border: none; border-top: 1px solid var(--hairline-soft); }
+  @media (max-width: 900px) { .thanks { padding: 60px 0 20px; } }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="wordmark" href="index.html">Compostela</a>
+      <nav class="site-nav" id="siteNav" aria-label="Primary">
+        <a href="gallery.html">Shop Gallery</a>
+        <a href="#">Journaling</a>
+        <a href="#">Daily Prayer</a>
+        <a href="#">Podcast</a>
+        <a href="#">Development</a>
+      </nav>
+      <div class="header-actions">
+        <button class="cart-button" type="button" data-cart-open>
+          Basket <span class="cart-button__count" data-cart-count>(0)</span>
+        </button>
+        <button class="hamburger" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="siteNav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="thanks">
+      <p class="eyebrow">Order received</p>
+      <h1 class="display">Thank you</h1>
+      <p>Your order is in. A receipt is on its way to the address you gave at checkout, and we will write again when the work is dispatched.</p>
+      <p id="reference" hidden></p>
+      <hr class="rule">
+      <p style="margin-top:28px">Prints are made to order, so there is a short wait before anything ships. Everything in the gallery is printed the same way.</p>
+      <a class="btn" href="gallery.html">Back to the gallery</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <div class="site-footer__links">
+        <a href="index.html">2026</a>
+        <a href="https://compostela.substack.com" target="_blank" rel="noopener">Substack</a>
+        <a href="#">Shipping &amp; Returns</a>
+      </div>
+      <img class="mark" src="logo.png" alt="Compostela logo">
+    </div>
+  </footer>
+
+  <script src="assets/catalog.js"></script>
+  <script src="assets/pricing.js"></script>
+  <script src="assets/shop.js"></script>
+  <script>
+    (function () {
+      Shop.init();
+
+      // Only empty the basket when Stripe actually sent the customer here.
+      // Landing on this page directly must not throw someone's order away.
+      var sessionId = new URLSearchParams(window.location.search).get('session_id');
+      if (sessionId) {
+        Shop.clearCart();
+        var ref = document.getElementById('reference');
+        ref.textContent = 'Reference: ' + sessionId.slice(-12);
+        ref.hidden = false;
+      }
+    })();
+  </script>
+</body>
+</html>

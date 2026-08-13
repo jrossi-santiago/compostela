@@ -201,12 +201,13 @@
       <div>
         <p class="eyebrow">Printing</p>
         <h3>Cotton rag, printed to order</h3>
-        <p>Every piece is printed when you order it, on 310gsm archival cotton rag with pigment inks rated well past a lifetime.</p>
+        <!-- Filled from catalog.js so the specs are stated in one place only. -->
+        <p id="printingNote"></p>
       </div>
       <div>
         <p class="eyebrow">Framing</p>
         <h3>Gilded oak or dark walnut</h3>
-        <p>Add a frame at checkout and it arrives ready to hang &mdash; glazed, backed, and wired. Or take the print bare and frame it yourself.</p>
+        <p id="framingNote"></p>
       </div>
       <div>
         <p class="eyebrow">Correspondence</p>
@@ -228,10 +229,14 @@
   </footer>
 
   <script src="assets/catalog.js"></script>
+  <script src="assets/pricing.js"></script>
   <script src="assets/shop.js"></script>
   <script>
     (function () {
       Shop.init();
+
+      document.getElementById('printingNote').textContent = Shop.catalog.policies.details;
+      document.getElementById('framingNote').textContent = Shop.catalog.policies.framing;
 
       var grid = document.getElementById('grid');
       var empty = document.getElementById('empty');
