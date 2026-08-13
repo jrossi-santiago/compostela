@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gallery — Compostela</title>
+<meta name="description" content="Archival prints of sacred art from the Catholic tradition, printed to order and made for the room you actually live in.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .gallery-hero { padding: 76px 0 52px; }
+  .gallery-hero h1 { font-size: clamp(42px, 6vw, 76px); margin: 14px 0 22px; }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .filters { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 22px; }
+
+  .filter {
+    padding: 0;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 17px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    line-height: 1.4;
+  }
+
+  .filter:hover { color: var(--ink); }
+  .filter[aria-pressed='true'] { color: var(--accent); border-bottom-color: var(--gilt); }
+
+  .controls__right { display: flex; align-items: flex-end; gap: 18px; }
+  .controls__right .field { min-width: 190px; }
+  .controls__right .select, .controls__right .input { padding: 9px 12px; font-size: 15px; }
+  .controls__right .select { padding-right: 34px; }
+
+  .result-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0 34px;
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 56px 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card a { display: flex; flex-direction: column; height: 100%; text-decoration: none; }
+  .card .plate { aspect-ratio: 3 / 4; }
+  .card a:hover .plate img { transform: scale(1.035); }
+
+  .card__frame { position: relative; display: block; overflow: hidden; }
+
+  .card__tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 2;
+    padding: 5px 11px;
+    background: var(--bg);
+    border: 1px solid var(--hairline);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* Column layout so the price rule sits on one line across the whole row,
+     however many lines a title runs to. */
+  .card__body { display: flex; flex-direction: column; flex: 1; padding-top: 18px; }
+  .card__title { display: block; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 27px; line-height: 1.15; }
+  .card a:hover .card__title { color: var(--accent); }
+  .card__attr { display: block; font-size: 15px; color: var(--ink-soft); font-style: italic; margin-top: 4px; }
+
+  .card__foot {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline-soft);
+    font-size: 15px;
+  }
+
+  .card__price { letter-spacing: 0.02em; }
+  .card__coll { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); }
+
+  .empty { padding: 80px 0; text-align: center; color: var(--ink-soft); font-style: italic; }
+
+  .closing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 96px;
+    padding-top: 40px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .closing h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 24px; margin: 12px 0 8px; }
+  .closing p { margin: 0; color: var(--ink-soft); font-size: 16px; }
+
+  @media (max-width: 900px) {
+    .gallery-hero { padding: 46px 0 34px; }
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 20px; }
+    .card__title { font-size: 20px; }
+    .card__attr { font-size: 14px; }
+    .controls { align-items: flex-start; flex-direction: column; }
+    .controls__right { width: 100%; }
+    .controls__right .field { flex: 1; min-width: 0; }
+    .closing { grid-template-columns: 1fr; gap: 28px; margin-top: 64px; }
+  }
+
+  @media (max-width: 560px) {
+    .card__foot { font-size: 14px; }
+    .card__coll { display: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="wordmark" href="index.html">Compostela</a>
+      <nav class="site-nav" id="siteNav" aria-label="Primary">
+        <a href="gallery.html" aria-current="page">Shop Gallery</a>
+        <a href="#">Journaling</a>
+        <a href="#">Daily Prayer</a>
+        <a href="#">Podcast</a>
+        <a href="#">Development</a>
+      </nav>
+      <div class="header-actions">
+        <button class="cart-button" type="button" data-cart-open>
+          Basket <span class="cart-button__count" data-cart-count>(0)</span>
+        </button>
+        <button class="hamburger" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="siteNav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="gallery-hero">
+      <p class="eyebrow">The Gallery</p>
+      <h1 class="display">Sacred art for the<br>room you live in</h1>
+      <p class="lede">Archival prints of the tradition&rsquo;s great devotional paintings &mdash; printed to order on cotton rag, sized to hang without fuss. Ethics and aesthetics are one.</p>
+    </section>
+
+    <section aria-label="Browse the collection">
+      <div class="controls">
+        <div class="filters" id="filters" role="group" aria-label="Filter by collection"></div>
+        <div class="controls__right">
+          <label class="field">
+            <span class="field__label">Search</span>
+            <input class="input" type="search" id="search" placeholder="Title or artist" autocomplete="off">
+          </label>
+          <label class="field">
+            <span class="field__label">Sort</span>
+            <select class="select" id="sort">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="title">Title: A–Z</option>
+              <option value="artist">Artist: A–Z</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="result-line">
+        <span id="resultCount">&nbsp;</span>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer">
+          <input type="checkbox" id="availableOnly"> Available only
+        </label>
+      </div>
+
+      <ul class="grid" id="grid"></ul>
+      <p class="empty" id="empty" hidden>Nothing under that description. Try another collection.</p>
+    </section>
+
+    <section class="closing">
+      <div>
+        <p class="eyebrow">Printing</p>
+        <h3>Cotton rag, printed to order</h3>
+        <p>Every piece is printed when you order it, on 310gsm archival cotton rag with pigment inks rated well past a lifetime.</p>
+      </div>
+      <div>
+        <p class="eyebrow">Framing</p>
+        <h3>Gilded oak or dark walnut</h3>
+        <p>Add a frame at checkout and it arrives ready to hang &mdash; glazed, backed, and wired. Or take the print bare and frame it yourself.</p>
+      </div>
+      <div>
+        <p class="eyebrow">Correspondence</p>
+        <h3>Looking for something else</h3>
+        <p>If there is a work you want and we do not carry it, <a class="link-quiet" href="https://compostela.substack.com" target="_blank" rel="noopener">write to us</a>. The catalog grows by request.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <div class="site-footer__links">
+        <a href="index.html">2026</a>
+        <a href="https://compostela.substack.com" target="_blank" rel="noopener">Substack</a>
+        <a href="#">Shipping &amp; Returns</a>
+      </div>
+      <img class="mark" src="logo.png" alt="Compostela logo">
+    </div>
+  </footer>
+
+  <script src="assets/catalog.js"></script>
+  <script src="assets/shop.js"></script>
+  <script>
+    (function () {
+      Shop.init();
+
+      var grid = document.getElementById('grid');
+      var empty = document.getElementById('empty');
+      var filtersEl = document.getElementById('filters');
+      var searchEl = document.getElementById('search');
+      var sortEl = document.getElementById('sort');
+      var availableEl = document.getElementById('availableOnly');
+      var countEl = document.getElementById('resultCount');
+
+      var params = new URLSearchParams(window.location.search);
+      var state = {
+        collection: params.get('collection') || 'all',
+        query: params.get('q') || '',
+        sort: params.get('sort') || 'featured',
+        availableOnly: params.get('available') === '1'
+      };
+
+      searchEl.value = state.query;
+      sortEl.value = state.sort;
+      availableEl.checked = state.availableOnly;
+
+      function renderFilters() {
+        var options = [{ id: 'all', label: 'All work' }].concat(Shop.catalog.collections);
+        filtersEl.innerHTML = options.map(function (option) {
+          var on = option.id === state.collection;
+          return '<button class="filter" type="button" data-collection="' + option.id + '"' +
+                 ' aria-pressed="' + on + '">' + Shop.escapeHTML(option.label) + '</button>';
+        }).join('');
+      }
+
+      function matches(work) {
+        if (state.collection !== 'all' && work.collection !== state.collection) return false;
+        if (state.availableOnly && Shop.isSoldOut(work)) return false;
+        if (state.query) {
+          var hay = (work.title + ' ' + work.artist + ' ' + work.medium).toLowerCase();
+          if (hay.indexOf(state.query.toLowerCase().trim()) === -1) return false;
+        }
+        return true;
+      }
+
+      function sortWorks(works) {
+        var sorted = works.slice();
+        if (state.sort === 'price-asc') {
+          sorted.sort(function (a, b) { return Shop.priceFrom(a) - Shop.priceFrom(b); });
+        } else if (state.sort === 'price-desc') {
+          sorted.sort(function (a, b) { return Shop.priceFrom(b) - Shop.priceFrom(a); });
+        } else if (state.sort === 'title') {
+          sorted.sort(function (a, b) { return a.title.localeCompare(b.title); });
+        } else if (state.sort === 'artist') {
+          sorted.sort(function (a, b) { return a.artist.localeCompare(b.artist); });
+        } else {
+          sorted.sort(function (a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0); });
+        }
+        return sorted;
+      }
+
+      function cardHTML(work, index) {
+        var soldOut = Shop.isSoldOut(work);
+        var href = 'product.html?work=' + encodeURIComponent(work.slug);
+        var tag = soldOut ? 'Sold out' : (work.featured ? 'Featured' : '');
+        return (
+          '<li class="card">' +
+            '<a href="' + href + '">' +
+              '<span class="card__frame">' +
+                (tag ? '<span class="card__tag">' + tag + '</span>' : '') +
+                Shop.plateHTML(work, { eager: index < 3 }) +
+              '</span>' +
+              '<span class="card__body">' +
+                '<span class="card__title">' + Shop.escapeHTML(work.title) + '</span>' +
+                '<span class="card__attr">' + Shop.escapeHTML(work.artist) + ', ' + Shop.escapeHTML(work.year) + '</span>' +
+                '<span class="card__foot">' +
+                  '<span class="card__price">' +
+                    (soldOut ? 'Sold out' : 'From ' + Shop.money(Shop.priceFrom(work))) +
+                  '</span>' +
+                  '<span class="card__coll">' + Shop.escapeHTML(Shop.collectionLabel(work.collection)) + '</span>' +
+                '</span>' +
+              '</span>' +
+            '</a>' +
+          '</li>'
+        );
+      }
+
+      function syncURL() {
+        var next = new URLSearchParams();
+        if (state.collection !== 'all') next.set('collection', state.collection);
+        if (state.query) next.set('q', state.query);
+        if (state.sort !== 'featured') next.set('sort', state.sort);
+        if (state.availableOnly) next.set('available', '1');
+        var qs = next.toString();
+        history.replaceState(null, '', qs ? '?' + qs : window.location.pathname);
+      }
+
+      function render() {
+        var works = sortWorks(Shop.catalog.works.filter(matches));
+        grid.innerHTML = works.map(cardHTML).join('');
+        empty.hidden = works.length > 0;
+        countEl.textContent = works.length === 1
+          ? '1 work'
+          : works.length + ' works';
+        renderFilters();
+        syncURL();
+      }
+
+      filtersEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-collection]');
+        if (!btn) return;
+        state.collection = btn.getAttribute('data-collection');
+        render();
+      });
+
+      var searchTimer;
+      searchEl.addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function () {
+          state.query = searchEl.value;
+          render();
+        }, 140);
+      });
+
+      sortEl.addEventListener('change', function () { state.sort = sortEl.value; render(); });
+      availableEl.addEventListener('change', function () { state.availableOnly = availableEl.checked; render(); });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

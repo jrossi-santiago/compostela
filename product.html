@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compostela — Gallery</title>
+<meta name="description" content="An archival print from the Compostela gallery, printed to order on cotton rag.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .crumbs { padding: 26px 0 0; font-size: 14px; color: var(--ink-soft); }
+  .crumbs a { text-decoration: none; }
+  .crumbs a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .crumbs span { color: var(--ink-faint); margin: 0 8px; }
+
+  .work {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 72px;
+    align-items: start;
+    padding: 34px 0 0;
+  }
+
+  .work__figure { position: sticky; top: 108px; margin: 0; }
+
+  .work__plate {
+    display: block;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: zoom-in;
+  }
+
+  .work__plate .plate { aspect-ratio: 3 / 4; }
+  .work__plate:hover .plate img { transform: scale(1.02); }
+
+  .work__caption {
+    margin-top: 16px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: center;
+  }
+
+  .work__title { font-size: clamp(38px, 4.6vw, 58px); margin-bottom: 12px; }
+
+  .work__meta {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 26px;
+  }
+
+  .work__desc { max-width: 52ch; color: var(--ink-soft); margin: 0 0 30px; }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .price__amount { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 34px; line-height: 1; }
+  .price__note { font-size: 14px; color: var(--ink-soft); font-style: italic; }
+
+  .options { display: grid; gap: 20px; padding: 26px 0 24px; }
+  .options__row { display: grid; grid-template-columns: 1fr 132px; gap: 16px; align-items: end; }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: var(--bg-raised);
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+  }
+
+  .stepper button {
+    width: 30px; height: 30px;
+    background: none; border: none;
+    font: inherit; font-size: 18px; color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  .stepper button:hover { color: var(--accent); }
+  .stepper span { font-size: 16px; min-width: 24px; text-align: center; }
+
+  .stock {
+    margin: 0 0 20px;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .accordions { margin-top: 34px; border-top: 1px solid var(--hairline-soft); }
+
+  details { border-bottom: 1px solid var(--hairline-soft); }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 2px;
+    list-style: none;
+    cursor: pointer;
+    font-size: 17px;
+  }
+
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-size: 18px; color: var(--ink-soft); }
+  details[open] summary::after { content: '–'; }
+  summary:hover { color: var(--accent); }
+
+  details p {
+    margin: 0 0 20px;
+    max-width: 56ch;
+    font-size: 16px;
+    color: var(--ink-soft);
+  }
+
+  .cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 38px;
+    padding: 30px 34px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border-radius: 2px;
+    text-decoration: none;
+    transition: background 0.18s ease;
+  }
+
+  .cta:hover { background: var(--accent-hover); }
+  .cta span:first-child { font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; }
+  .cta span:last-child { font-size: 20px; }
+
+  .related { margin-top: 110px; padding-top: 34px; border-top: 1px solid var(--hairline); }
+  .related h2 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 30px; margin: 10px 0 30px; }
+
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 34px 28px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .related__grid a { display: block; text-decoration: none; }
+  .related__grid .plate { aspect-ratio: 3 / 4; }
+  .related__grid a:hover .plate img { transform: scale(1.035); }
+  .related__title { display: block; font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-top: 14px; line-height: 1.15; }
+  .related__grid a:hover .related__title { color: var(--accent); }
+  .related__price { display: block; font-size: 14px; color: var(--ink-soft); margin-top: 4px; }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5vh 5vw;
+    background: rgba(28, 21, 15, 0.92);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    cursor: zoom-out;
+  }
+
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lightbox img { max-width: 100%; max-height: 90vh; object-fit: contain; }
+  .lightbox .icon-button { position: absolute; top: 22px; right: 26px; color: var(--accent-text); font-size: 28px; }
+
+  .notfound { padding: 120px 0 60px; }
+  .notfound h1 { font-size: clamp(34px, 5vw, 54px); margin-bottom: 16px; }
+
+  @media (max-width: 900px) {
+    .work { grid-template-columns: 1fr; gap: 34px; padding-top: 22px; }
+    .work__figure { position: static; }
+    .options__row { grid-template-columns: 1fr; }
+    .cta { padding: 24px; }
+    .related { margin-top: 70px; }
+    .related__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; }
+    .related__title { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell site-header__inner">
+      <a class="wordmark" href="index.html">Compostela</a>
+      <nav class="site-nav" id="siteNav" aria-label="Primary">
+        <a href="gallery.html">Shop Gallery</a>
+        <a href="#">Journaling</a>
+        <a href="#">Daily Prayer</a>
+        <a href="#">Podcast</a>
+        <a href="#">Development</a>
+      </nav>
+      <div class="header-actions">
+        <button class="cart-button" type="button" data-cart-open>
+          Basket <span class="cart-button__count" data-cart-count>(0)</span>
+        </button>
+        <button class="hamburger" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="siteNav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell" id="main"></main>
+
+  <footer class="site-footer">
+    <div class="shell site-footer__inner">
+      <div class="site-footer__links">
+        <a href="index.html">2026</a>
+        <a href="https://compostela.substack.com" target="_blank" rel="noopener">Substack</a>
+        <a href="#">Shipping &amp; Returns</a>
+      </div>
+      <img class="mark" src="logo.png" alt="Compostela logo">
+    </div>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="icon-button" type="button" id="lightboxClose" aria-label="Close image">&times;</button>
+    <img id="lightboxImage" src="" alt="">
+  </div>
+
+  <script src="assets/catalog.js"></script>
+  <script src="assets/shop.js"></script>
+  <script>
+    (function () {
+      Shop.init();
+
+      var main = document.getElementById('main');
+      var slug = new URLSearchParams(window.location.search).get('work');
+      var work = slug ? Shop.workBySlug(slug) : null;
+
+      if (!work) {
+        main.innerHTML =
+          '<section class="notfound">' +
+            '<p class="eyebrow">Not in the catalog</p>' +
+            '<h1 class="display">We could not find that work</h1>' +
+            '<p class="lede">It may have been retired, or the link may be mistyped. The full gallery is a click away.</p>' +
+            '<p style="margin-top:28px"><a class="btn" href="gallery.html">Browse the gallery</a></p>' +
+          '</section>';
+        return;
+      }
+
+      document.title = work.title + ' — Compostela';
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', work.blurb);
+
+      var sizes = Shop.availableSizes(work);
+      var firstInStock = sizes.filter(function (s) { return !Shop.isSizeSoldOut(work, s.id); })[0];
+      var state = {
+        sizeId: (firstInStock || sizes[0]).id,
+        frameId: Shop.catalog.frames[0].id,
+        qty: 1
+      };
+
+      function currentPrice() {
+        var frame = Shop.frameById(state.frameId);
+        return work.prices[state.sizeId] + frame.price;
+      }
+
+      function sizeOptions() {
+        return sizes.map(function (size) {
+          var soldOut = Shop.isSizeSoldOut(work, size.id);
+          return '<option value="' + size.id + '"' + (soldOut ? ' disabled' : '') +
+                 (size.id === state.sizeId ? ' selected' : '') + '>' +
+                 Shop.escapeHTML(size.label + ' — ' + size.dimensions) +
+                 (soldOut ? ' — sold out' : ' — ' + Shop.money(work.prices[size.id])) +
+                 '</option>';
+        }).join('');
+      }
+
+      function frameOptions() {
+        return Shop.catalog.frames.map(function (frame) {
+          return '<option value="' + frame.id + '"' + (frame.id === state.frameId ? ' selected' : '') + '>' +
+                 Shop.escapeHTML(frame.label) +
+                 (frame.price ? ' — add ' + Shop.money(frame.price) : '') +
+                 '</option>';
+        }).join('');
+      }
+
+      function relatedHTML() {
+        var siblings = Shop.catalog.works.filter(function (other) {
+          return other.slug !== work.slug && other.collection === work.collection;
+        });
+        if (siblings.length < 3) {
+          Shop.catalog.works.forEach(function (other) {
+            if (siblings.length < 4 && other.slug !== work.slug && siblings.indexOf(other) === -1) {
+              siblings.push(other);
+            }
+          });
+        }
+        siblings = siblings.slice(0, 4);
+
+        return (
+          '<section class="related">' +
+            '<p class="eyebrow">' + Shop.escapeHTML(Shop.collectionLabel(work.collection)) + '</p>' +
+            '<h2>More from this collection</h2>' +
+            '<ul class="related__grid">' +
+              siblings.map(function (other) {
+                return '<li><a href="product.html?work=' + encodeURIComponent(other.slug) + '">' +
+                  Shop.plateHTML(other) +
+                  '<span class="related__title">' + Shop.escapeHTML(other.title) + '</span>' +
+                  '<span class="related__price">' +
+                    (Shop.isSoldOut(other) ? 'Sold out' : 'From ' + Shop.money(Shop.priceFrom(other))) +
+                  '</span></a></li>';
+              }).join('') +
+            '</ul>' +
+          '</section>'
+        );
+      }
+
+      main.innerHTML =
+        '<nav class="crumbs" aria-label="Breadcrumb">' +
+          '<a href="gallery.html">Gallery</a><span>/</span>' +
+          '<a href="gallery.html?collection=' + encodeURIComponent(work.collection) + '">' +
+            Shop.escapeHTML(Shop.collectionLabel(work.collection)) + '</a>' +
+          '<span>/</span>' + Shop.escapeHTML(work.title) +
+        '</nav>' +
+
+        '<article class="work">' +
+          '<figure class="work__figure">' +
+            '<button class="work__plate" type="button" id="zoom" aria-label="View ' + Shop.escapeHTML(work.title) + ' larger">' +
+              Shop.plateHTML(work, { eager: true }) +
+            '</button>' +
+            '<figcaption class="work__caption">' + Shop.escapeHTML(work.title) + '</figcaption>' +
+          '</figure>' +
+
+          '<div>' +
+            '<h1 class="display work__title">' + Shop.escapeHTML(work.title) + '</h1>' +
+            '<p class="work__meta">' +
+              Shop.escapeHTML(work.artist) + ' · ' + Shop.escapeHTML(work.year) + ' · ' + Shop.escapeHTML(work.medium) +
+            '</p>' +
+            '<p class="work__desc">' + Shop.escapeHTML(work.description) + '</p>' +
+
+            '<div class="price">' +
+              '<span class="price__amount" id="priceAmount"></span>' +
+              '<span class="price__note">Printed to order</span>' +
+            '</div>' +
+
+            '<div class="options">' +
+              '<label class="field"><span class="field__label">Size</span>' +
+                '<select class="select" id="sizeSelect">' + sizeOptions() + '</select></label>' +
+              '<div class="options__row">' +
+                '<label class="field"><span class="field__label">Framing</span>' +
+                  '<select class="select" id="frameSelect">' + frameOptions() + '</select></label>' +
+                '<div class="field"><span class="field__label">Quantity</span>' +
+                  '<div class="stepper">' +
+                    '<button type="button" id="qtyDown" aria-label="Decrease quantity">&minus;</button>' +
+                    '<span id="qtyValue">1</span>' +
+                    '<button type="button" id="qtyUp" aria-label="Increase quantity">+</button>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<p class="stock" id="stockLine"></p>' +
+            '<button class="btn btn--block" type="button" id="addToCart">Add to basket</button>' +
+
+            '<div class="accordions">' +
+              '<details open><summary>Details &amp; framing</summary>' +
+                '<p>' + Shop.escapeHTML(work.details) + '</p>' +
+                '<p>Frames are made to the print&rsquo;s dimensions in gilded oak or dark walnut, glazed with UV-filtering acrylic and delivered wired and ready to hang.</p>' +
+              '</details>' +
+              '<details><summary>Shipping</summary>' +
+                '<p>Prints are made when you order, so allow three to five working days before dispatch. Unframed prints ship rolled in a rigid tube; framed pieces ship boxed and corner-protected.</p>' +
+                '<p>Domestic delivery runs two to five days after dispatch. International orders are sent tracked; any duties are the recipient&rsquo;s.</p>' +
+              '</details>' +
+              '<details><summary>Returns</summary>' +
+                '<p>If a piece arrives damaged or is not what you expected, write to us within thirty days and we will replace it or refund it. Framed pieces should be returned in their original packing.</p>' +
+              '</details>' +
+            '</div>' +
+
+            '<a class="cta" href="gallery.html">' +
+              '<span>See more work</span><span>&rarr;</span>' +
+            '</a>' +
+          '</div>' +
+        '</article>' +
+
+        relatedHTML();
+
+      /* ---------- interaction ---------- */
+
+      var priceAmount = document.getElementById('priceAmount');
+      var stockLine = document.getElementById('stockLine');
+      var addBtn = document.getElementById('addToCart');
+      var qtyValue = document.getElementById('qtyValue');
+      var sizeSelect = document.getElementById('sizeSelect');
+      var frameSelect = document.getElementById('frameSelect');
+
+      function sync() {
+        var soldOut = Shop.isSizeSoldOut(work, state.sizeId);
+        priceAmount.textContent = soldOut ? 'Sold out' : Shop.money(currentPrice() * state.qty);
+        qtyValue.textContent = state.qty;
+        addBtn.disabled = soldOut;
+        addBtn.textContent = soldOut ? 'Sold out in this size' : 'Add to basket';
+        stockLine.textContent = soldOut
+          ? 'This size has sold out. Another size may still be available.'
+          : 'In stock — printed and dispatched within three to five working days.';
+      }
+
+      sizeSelect.addEventListener('change', function () { state.sizeId = sizeSelect.value; sync(); });
+      frameSelect.addEventListener('change', function () { state.frameId = frameSelect.value; sync(); });
+
+      document.getElementById('qtyDown').addEventListener('click', function () {
+        state.qty = Math.max(1, state.qty - 1); sync();
+      });
+      document.getElementById('qtyUp').addEventListener('click', function () {
+        state.qty = Math.min(20, state.qty + 1); sync();
+      });
+
+      addBtn.addEventListener('click', function () {
+        Shop.addToCart({ slug: work.slug, sizeId: state.sizeId, frameId: state.frameId, qty: state.qty });
+        Shop.openCart();
+      });
+
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImage = document.getElementById('lightboxImage');
+
+      document.getElementById('zoom').addEventListener('click', function () {
+        var img = this.querySelector('img');
+        if (!img) return; // no image file yet — nothing to enlarge
+        lightboxImage.src = img.src;
+        lightboxImage.alt = img.alt;
+        lightbox.hidden = false;
+        requestAnimationFrame(function () { lightbox.classList.add('open'); });
+      });
+
+      function closeLightbox() {
+        lightbox.classList.remove('open');
+        setTimeout(function () { lightbox.hidden = true; }, 250);
+      }
+
+      lightbox.addEventListener('click', closeLightbox);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+      });
+
+      sync();
+    })();
+  </script>
+</body>
+</html>
