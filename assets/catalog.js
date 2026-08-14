@@ -86,6 +86,7 @@
   ];
 
   var collections = [
+    { id: 'gospels', label: 'The Gospels' },
     { id: 'marian', label: 'Marian' },
     { id: 'passion', label: 'The Passion' },
     { id: 'saints', label: 'The Saints' },
@@ -102,6 +103,18 @@
    *   details     OPTIONAL — only when a work differs from policies.details
    */
   var works = [
+    {
+      slug: 'the-storm-on-the-sea-of-galilee',
+      title: 'The Storm on the Sea of Galilee',
+      artist: 'Rembrandt',
+      year: '1633',
+      medium: 'Oil on canvas',
+      collection: 'gospels',
+      prices: priceLadder.large,
+      featured: true,
+      blurb: 'Rembrandt’s only seascape, and the most famous painting nobody can see.',
+      description: 'Mark 4 verses 35 to 41, painted when Rembrandt was twenty-seven: the boat pitched almost vertical, the sail already splitting, and Christ at the stern being woken by men who have run out of nerve. Count the figures and there are fourteen aboard where the Gospel has thirteen — the one gripping a rope and looking straight out at you is Rembrandt himself. The canvas was cut from its frame at the Isabella Stewart Gardner Museum in 1990 and has never been recovered. The empty frame still hangs in the room it was taken from.'
+    },
     {
       slug: 'the-annunciation',
       title: 'The Annunciation',
