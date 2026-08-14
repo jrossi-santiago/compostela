@@ -236,7 +236,6 @@
       medium: 'Oil on wood',
       collection: 'passion',
       prices: priceLadder.large,
-      soldOut: ['24x36'],
       blurb: 'Raphael’s last painting: glory above, and a crowd below that cannot heal anyone.',
       description: 'Two registers held in one frame — the mountain lit white, the confusion at its foot. Raphael was still working on it when he died, and it hung above him at his funeral. The lower half is why it is a great painting and not merely a beautiful one.'
     },

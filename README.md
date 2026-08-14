@@ -1,14 +1,13 @@
 # Compostela
 
 A Catholic press. Static site — plain HTML, CSS and JavaScript, no build step
-and no framework — plus one serverless function that creates Stripe Checkout
-sessions.
+and no framework — plus two serverless functions that talk to Stripe.
 
 ```
 index.html            landing page
 gallery.html          the shop
 product.html          one work, read from ?work=<slug>
-thank-you.html        where Stripe returns the customer
+thank-you.html        order confirmation, read from ?session_id=<id>
 
 assets/catalog.js     THE source of truth: works, prices, policies, shipping
 assets/pricing.js     price + validation logic, shared by browser and server
@@ -17,6 +16,7 @@ assets/site.css       shop chrome
 assets/art/<slug>.jpg artwork, named after the slug
 
 api/checkout.js       creates the Stripe Checkout Session
+api/order.js          reads one back, for the confirmation page
 ```
 
 ## The one-place rule
@@ -95,7 +95,7 @@ the product page, the basket and the Stripe delivery estimate alike.
 2. Add the environment variable **`STRIPE_SECRET_KEY`** in Project Settings →
    Environment Variables. Use the test key (`sk_test_…`) first. It is only
    ever read server-side; it must never be committed or appear in any page.
-3. Deploy. `/api/checkout` goes live with the site.
+3. Deploy. `/api/checkout` and `/api/order` go live with the site.
 
 Optional: set `STRIPE_TAX=1` **only after** enabling Stripe Tax and adding
 your registrations in the Stripe dashboard. Until then, leave it unset —
@@ -109,10 +109,35 @@ turning it on early makes every checkout session fail.
    unknown works and sold-out sizes, and computes the total itself.
 3. It creates a Stripe Checkout Session with the amounts built on the fly.
 4. The customer pays on Stripe's hosted page; Stripe sends the receipt.
-5. Stripe returns them to `thank-you.html`, which clears the basket.
+5. Stripe returns them to `thank-you.html?session_id=…`, which asks
+   `api/order.js` what was actually bought and shows it back to them.
 
 Because step 2 never trusts a number from the browser, a customer editing
 their local storage cannot change what they are charged.
+
+## The confirmation page
+
+`thank-you.html` cannot ask Stripe anything itself — reading a session needs
+the secret key. So it calls `api/order.js`, which returns a narrow view of the
+order: reference, line items, totals, shipping address, and the card brand and
+last four. No payment intent, no customer id, nothing else.
+
+Holding the session id is what authorises the read, which is the same basis
+Stripe's own hosted receipts use — the id is long, random, and was just handed
+to that customer.
+
+The page has four states, and the difference between them matters:
+
+| state | what the customer sees | basket |
+|---|---|---|
+| paid | full order summary | cleared |
+| not paid (backed out, expired) | "this one did not go through" | **kept** |
+| lookup failed | thank-you + reference to quote | **kept** |
+| no `session_id` (bookmark, back button) | "nothing to show here" | **kept** |
+
+The basket is only ever emptied once Stripe has confirmed payment. Clearing it
+on arrival would throw away a live basket whenever a lookup hiccuped or someone
+opened the page by accident.
 
 Orders appear in the Stripe dashboard. Nothing automates fulfilment yet — a
 webhook to a print lab would be the next piece.

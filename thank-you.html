@@ -10,12 +10,111 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 <style>
-  .thanks { padding: 110px 0 40px; max-width: 640px; }
-  .thanks h1 { font-size: clamp(38px, 5.4vw, 62px); margin: 14px 0 22px; }
-  .thanks p { color: var(--ink-soft); }
+  .thanks { padding: 96px 0 40px; max-width: 720px; }
+  .thanks h1 { font-size: clamp(38px, 5.4vw, 62px); margin: 14px 0 20px; }
+  .thanks .lede { color: var(--ink-soft); }
   .thanks .btn { margin-top: 34px; }
   .rule { margin: 44px 0 0; border: none; border-top: 1px solid var(--hairline-soft); }
-  @media (max-width: 900px) { .thanks { padding: 60px 0 20px; } }
+
+  /* ---------- order panel ---------- */
+
+  .order {
+    margin-top: 44px;
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    background: var(--bg-raised);
+  }
+
+  .order__head {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px 28px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .order__field .eyebrow { display: block; margin-bottom: 5px; }
+  .order__field span:last-child { font-size: 16px; word-break: break-word; }
+  .order__ref { font-variant-numeric: tabular-nums; letter-spacing: 0.06em; }
+
+  .order__lines { list-style: none; margin: 0; padding: 0; }
+
+  .order__line {
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    gap: 20px;
+    align-items: start;
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+
+  .order__line .plate { aspect-ratio: 3 / 4; padding: 5%; }
+  .order__line-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; line-height: 1.2; }
+  a.order__line-title { text-decoration: none; display: block; }
+  a.order__line-title:hover { color: var(--accent); }
+  .order__line-detail { margin-top: 5px; font-size: 15px; color: var(--ink-soft); }
+  .order__line-amount { font-size: 17px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .order__totals { padding: 20px 28px; border-bottom: 1px solid var(--hairline-soft); }
+
+  .order__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 7px;
+  }
+
+  .order__row span:last-child { font-variant-numeric: tabular-nums; }
+
+  .order__row--total {
+    margin: 12px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline-soft);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+  }
+
+  .order__foot {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 24px 28px;
+    padding: 24px 28px;
+  }
+
+  .order__foot address { font-style: normal; font-size: 16px; line-height: 1.65; color: var(--ink-soft); }
+  .order__foot p { margin: 0; font-size: 16px; line-height: 1.65; color: var(--ink-soft); }
+  .order__when { color: var(--ink); }
+
+  .notice {
+    margin-top: 34px;
+    padding: 20px 24px;
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--accent);
+    border-radius: 2px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .muted { color: var(--ink-faint); font-style: italic; }
+
+  @media (max-width: 640px) {
+    .thanks { padding: 56px 0 20px; }
+    .order__head, .order__totals, .order__foot { padding-left: 20px; padding-right: 20px; }
+    .order__line { grid-template-columns: 52px minmax(0, 1fr); padding: 18px 20px; }
+    .order__line-amount { grid-column: 2; margin-top: 4px; }
+  }
+
+  @media print {
+    .site-header, .site-footer, .thanks .btn, .notice { display: none; }
+    .thanks { padding-top: 0; }
+    .order { border-color: #999; background: none; }
+  }
 </style>
 </head>
 <body>
@@ -42,12 +141,14 @@
 
   <main class="shell">
     <section class="thanks">
-      <p class="eyebrow">Order received</p>
-      <h1 class="display">Thank you</h1>
-      <p>Your order is in. A receipt is on its way to the address you gave at checkout, and we will write again when the work is dispatched.</p>
-      <p id="reference" hidden></p>
+      <p class="eyebrow" id="eyebrow">Order received</p>
+      <h1 class="display" id="headline">Thank you</h1>
+      <p class="lede" id="lede">Looking up your order&hellip;</p>
+
+      <div class="order" id="order" hidden></div>
+      <div class="notice" id="notice" hidden></div>
+
       <hr class="rule">
-      <p style="margin-top:28px">Prints are made to order, so there is a short wait before anything ships. Everything in the gallery is printed the same way.</p>
       <a class="btn" href="gallery.html">Back to the gallery</a>
     </section>
   </main>
@@ -70,15 +171,177 @@
     (function () {
       Shop.init();
 
-      // Only empty the basket when Stripe actually sent the customer here.
-      // Landing on this page directly must not throw someone's order away.
+      var eyebrow = document.getElementById('eyebrow');
+      var headline = document.getElementById('headline');
+      var lede = document.getElementById('lede');
+      var panel = document.getElementById('order');
+      var notice = document.getElementById('notice');
+      var esc = Shop.escapeHTML;
+
       var sessionId = new URLSearchParams(window.location.search).get('session_id');
-      if (sessionId) {
-        Shop.clearCart();
-        var ref = document.getElementById('reference');
-        ref.textContent = 'Reference: ' + sessionId.slice(-12);
-        ref.hidden = false;
+
+      /* Receipts always show the cents, even on a whole-dollar amount — the
+         site's own money() drops them, which reads oddly on an order total. */
+      function money(cents, currency) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: (currency || 'usd').toUpperCase()
+        }).format((cents || 0) / 100);
       }
+
+      function longDate(ms) {
+        return new Date(ms).toLocaleDateString('en-US', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+      }
+
+      function shortDate(ms) {
+        return new Date(ms).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
+      }
+
+      function field(label, value) {
+        if (!value) return '';
+        return '<div class="order__field"><span class="eyebrow">' + esc(label) + '</span>' +
+               '<span>' + esc(value) + '</span></div>';
+      }
+
+      function row(label, value, cls) {
+        return '<div class="order__row' + (cls ? ' ' + cls : '') + '">' +
+               '<span>' + esc(label) + '</span><span>' + esc(value) + '</span></div>';
+      }
+
+      /* Reuses the gallery's image plate, so a work whose file has not landed
+         in assets/art/ yet falls back to the same labelled placeholder. */
+      function thumb(line) {
+        var work = line.slug ? Shop.workBySlug(line.slug) : null;
+        if (!work) return '<span></span>';
+        return '<a href="product.html?work=' + encodeURIComponent(work.slug) + '">' +
+               Shop.plateHTML(work, { eager: true }) + '</a>';
+      }
+
+      function lineHTML(line, currency) {
+        var work = line.slug ? Shop.workBySlug(line.slug) : null;
+        var title = esc(line.name) + (line.quantity > 1 ? ' &times; ' + line.quantity : '');
+        return '<li class="order__line">' +
+          thumb(line) +
+          '<div>' +
+            (work
+              ? '<a class="order__line-title" href="product.html?work=' + encodeURIComponent(work.slug) + '">' + title + '</a>'
+              : '<span class="order__line-title">' + title + '</span>') +
+            (line.detail ? '<div class="order__line-detail">' + esc(line.detail) + '</div>' : '') +
+          '</div>' +
+          '<span class="order__line-amount">' + money(line.amount, currency) + '</span>' +
+        '</li>';
+      }
+
+      function addressHTML(a) {
+        if (!a) return '';
+        var parts = [a.name, a.line1, a.line2,
+          [a.city, a.state, a.postalCode].filter(Boolean).join(' '), a.country];
+        return '<div><span class="eyebrow">Shipping to</span><address>' +
+          parts.filter(Boolean).map(esc).join('<br>') + '</address></div>';
+      }
+
+      function deliveryHTML(order) {
+        var ship = Shop.catalog.shipping;
+        var window_ = '';
+        if (order.placedAt) {
+          var day = 86400000;
+          window_ = ' Expect it between <span class="order__when">' +
+            shortDate(order.placedAt + ship.minDays * day) + '</span> and <span class="order__when">' +
+            shortDate(order.placedAt + ship.maxDays * day) + '</span>.';
+        }
+        return '<div><span class="eyebrow">Delivery</span><p>' +
+          ship.minDays + '&ndash;' + ship.maxDays + ' days from order to delivery.' + window_ +
+          ' We will write again when it is dispatched.</p></div>';
+      }
+
+      function renderOrder(order) {
+        var c = order.currency;
+        var head =
+          field('Order reference', order.reference) +
+          (order.placedAt ? field('Placed', longDate(order.placedAt)) : '') +
+          field('Confirmation sent to', order.email) +
+          (order.card ? field('Paid with', order.card.brand.toUpperCase() + ' ending ' + order.card.last4) : '');
+
+        var totals =
+          row('Subtotal', money(order.amountSubtotal, c)) +
+          (order.amountDiscount ? row('Discount', '&minus;' + money(order.amountDiscount, c)) : '') +
+          row('Shipping', money(order.amountShipping, c)) +
+          (order.amountTax ? row('Tax', money(order.amountTax, c)) : '') +
+          row('Total paid', money(order.amountTotal, c), 'order__row--total');
+
+        panel.innerHTML =
+          '<div class="order__head">' + head + '</div>' +
+          '<ul class="order__lines">' +
+            order.lines.map(function (l) { return lineHTML(l, c); }).join('') +
+          '</ul>' +
+          '<div class="order__totals">' + totals + '</div>' +
+          '<div class="order__foot">' + addressHTML(order.shipping) + deliveryHTML(order) + '</div>';
+        panel.hidden = false;
+      }
+
+      function showNotice(html) {
+        notice.innerHTML = html;
+        notice.hidden = false;
+      }
+
+      /* Landing here without a session id — a bookmark, or a back button.
+         Say something sensible and, above all, do not empty the basket. */
+      if (!sessionId) {
+        eyebrow.textContent = 'Orders';
+        headline.textContent = 'Nothing to show here';
+        lede.textContent = 'This page confirms an order once one has been placed. ' +
+          'If you have just bought something and landed here by accident, the ' +
+          'confirmation email has your order details.';
+        return;
+      }
+
+      fetch('/api/order?session_id=' + encodeURIComponent(sessionId), {
+        headers: { 'Accept': 'application/json' }
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            return { ok: response.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) throw new Error(result.data && result.data.error);
+          var order = result.data;
+
+          if (!order.paid) {
+            // Stripe sent them here, but the payment did not complete.
+            eyebrow.textContent = 'Order not completed';
+            headline.textContent = 'This one did not go through';
+            lede.textContent = 'Stripe has not recorded a payment against this checkout, ' +
+              'so nothing has been charged and nothing is being printed.';
+            showNotice('Your basket has been left exactly as it was, so you can ' +
+              'try again whenever you like. If you think this is wrong, ' +
+              'write to us with reference <strong>' + esc(order.reference) + '</strong>.');
+            return;
+          }
+
+          // Paid — and only now is it safe to empty the basket.
+          Shop.clearCart();
+
+          eyebrow.textContent = 'Order confirmed';
+          headline.textContent = 'Thank you';
+          lede.textContent = 'Your order went through and is being printed. ' +
+            'A receipt is on its way to your inbox, and the details are below.';
+          renderOrder(order);
+        })
+        .catch(function (err) {
+          /* The order almost certainly exists — the lookup is what failed. Do
+             not clear the basket on a maybe, and give them the reference so
+             they have something to quote. */
+          eyebrow.textContent = 'Order received';
+          headline.textContent = 'Thank you';
+          lede.textContent = 'Your order is in. We could not load the full details ' +
+            'just now, but the receipt on its way to your inbox has them.';
+          showNotice('Reference <strong>' + esc(sessionId.slice(-12).toUpperCase()) +
+            '</strong>' + (err && err.message ? ' &middot; <span class="muted">' + esc(err.message) + '</span>' : '') +
+            '<br>Quote that reference if you need to write to us about this order.');
+        });
     })();
   </script>
 </body>
