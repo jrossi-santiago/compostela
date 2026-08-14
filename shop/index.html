@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Gallery — Compostela</title>
+<meta name="description" content="Prints from the Compostela gallery. Sacred art, printed to order and shipped in 7–10 days.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e5d9c3;
+    --ink: #2b2118;
+    --ink-soft: #5c5142;
+    --hairline: rgba(43, 33, 24, 0.22);
+    --accent: #2c1930;
+    --accent-hover: #a9752c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'EB Garamond', Georgia, serif; }
+  .page { position: relative; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px 64px 64px; }
+  nav { position: relative; display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
+  .nav-left { display: flex; gap: 32px; font-size: 17px; }
+  .nav-left a { color: var(--ink); text-decoration: none; }
+  .nav-left a:hover { color: var(--accent); }
+  .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 24px; letter-spacing: 0.06em; }
+  .wordmark a { color: var(--ink); text-decoration: none; }
+  .nav-mark { display: none; height: 36px; width: auto; }
+  .hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 36px; height: 36px; padding: 0; background: none; border: none; cursor: pointer; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--ink); }
+
+  h1 { margin: 40px 0 8px; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 46px; line-height: 1.1; }
+  .intro { margin: 0 0 40px; max-width: 52ch; font-size: 18px; line-height: 1.6; color: var(--ink-soft); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 40px; }
+  .card { display: block; text-decoration: none; color: var(--ink); }
+  .card .plate { background: #ded1b8; border: 1px solid var(--hairline); padding: 18px; transition: border-color 0.15s ease; }
+  .card:hover .plate { border-color: var(--accent-hover); }
+  .card img { display: block; width: 100%; height: auto; }
+  .card h2 { margin: 14px 0 4px; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 26px; line-height: 1.2; }
+  .card:hover h2 { color: var(--accent-hover); }
+  .card p { margin: 0; font-size: 16px; font-style: italic; color: var(--ink-soft); }
+  .card .from { margin-top: 6px; font-style: normal; }
+
+  footer { display: flex; justify-content: space-between; align-items: center; margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--hairline); font-weight: 500; font-size: 17px; }
+  .footer-left { display: flex; gap: 28px; }
+  footer a { color: var(--ink); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+  .mark { height: 48px; width: auto; display: block; }
+
+  .toast { position: fixed; left: 0; top: 0; transform: translate(-50%, 2px); color: var(--ink-soft); font-weight: 400; font-style: italic; font-size: 13px; letter-spacing: 0.02em; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) { .page { padding: 32px 32px 48px; } }
+  @media (max-width: 640px) {
+    .page { padding: 20px 20px 40px; }
+    .nav-mark { display: block; height: 56px; }
+    .wordmark { display: none; }
+    .hamburger { display: flex; }
+    .nav-left {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      flex-direction: column; gap: 0; min-width: 180px; padding: 8px 20px;
+      background: var(--bg); border: 1px solid rgba(43, 33, 24, 0.15); border-radius: 4px; z-index: 50;
+    }
+    .nav-left.open { display: flex; }
+    .nav-left a { padding: 12px 0; font-size: 18px; border-bottom: 1px solid rgba(43, 33, 24, 0.1); }
+    .nav-left a:last-child { border-bottom: none; }
+    h1 { font-size: 34px; margin-top: 28px; }
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    footer .mark { display: none; }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <nav>
+      <img class="nav-mark" src="../logo.png" alt="Compostela logo">
+      <div class="nav-left" id="navLeft">
+        <a href="./">Shop Gallery</a>
+        <a href="#">Journaling</a>
+        <a href="#">Daily Prayer</a>
+        <a href="#">Podcast</a>
+        <a href="#">Development</a>
+      </div>
+      <div class="wordmark"><a href="../index.html">Compostela</a></div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-expanded="false" aria-controls="navLeft">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <h1>Shop Gallery</h1>
+    <p class="intro">
+      Sacred art for the home, printed to order and shipped in 7&ndash;10 days.
+      Good design yields good thoughts and a good life.
+    </p>
+
+    <div class="grid">
+      <a class="card" href="storm-on-the-sea-of-galilee.html">
+        <div class="plate">
+          <img src="images/storm-on-the-sea-of-galilee-thumb.jpg" alt="Rembrandt's The Storm on the Sea of Galilee">
+        </div>
+        <h2>The Storm on the Sea of Galilee</h2>
+        <p>Rembrandt van Rijn &middot; 1633</p>
+        <p class="from">Four sizes, framed or unframed &mdash; from $9.99</p>
+      </a>
+    </div>
+
+    <footer>
+      <div class="footer-left">
+        <a href="../index.html">2026</a>
+      </div>
+      <img class="mark" src="../logo.png" alt="Compostela logo">
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Coming Soon!</div>
+
+  <script>
+    var toast = document.getElementById('toast');
+    var toastTimeout;
+    var hamburgerBtn = document.getElementById('hamburgerBtn');
+    var navLeft = document.getElementById('navLeft');
+
+    function closeMenu() {
+      navLeft.classList.remove('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    hamburgerBtn.addEventListener('click', function () {
+      var isOpen = navLeft.classList.toggle('open');
+      hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (navLeft.classList.contains('open') && !navLeft.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    document.querySelectorAll('.nav-left a[href="#"], .footer-left a[href="#"]').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        clearTimeout(toastTimeout);
+        closeMenu();
+        var rect = link.getBoundingClientRect();
+        toast.style.left = (rect.left + rect.width / 2) + 'px';
+        toast.style.top = (rect.bottom + 6) + 'px';
+        toast.classList.add('show');
+        toastTimeout = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Storm on the Sea of Galilee — Compostela</title>
+<meta name="description" content="Rembrandt's The Storm on the Sea of Galilee (1633), printed by Compostela in four sizes, framed or unframed. 7–10 days from order to delivery.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e5d9c3;
+    --ink: #2b2118;
+    --ink-soft: #5c5142;
+    --hairline: rgba(43, 33, 24, 0.22);
+    --accent: #2c1930;
+    --accent-hover: #a9752c;
+    --accent-text: #f3ead9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'EB Garamond', Georgia, serif;
+  }
+  .page { position: relative; width: 100%; max-width: 1240px; margin: 0 auto; padding: 32px 64px 64px; }
+  nav { position: relative; display: flex; justify-content: space-between; align-items: center; font-family: 'EB Garamond', serif; font-weight: 500; }
+  .nav-left { display: flex; gap: 32px; font-size: 17px; }
+  .nav-left a, .nav-right a { color: var(--ink); text-decoration: none; }
+  .nav-left a:hover, .nav-right a:hover { color: var(--accent); }
+  .wordmark { font-family: 'Cormorant Garamond', serif; font-size: 24px; letter-spacing: 0.06em; }
+  .wordmark a { color: var(--ink); text-decoration: none; }
+  .nav-mark { display: none; height: 36px; width: auto; }
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--ink); }
+
+  .crumb { margin: 28px 0 0; font-size: 16px; color: var(--ink-soft); }
+  .crumb a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .crumb a:hover { color: var(--accent-hover); }
+
+  .product { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; margin-top: 24px; align-items: start; }
+
+  figure { margin: 0; }
+  .plate {
+    background: #ded1b8;
+    border: 1px solid var(--hairline);
+    padding: 28px;
+  }
+  .plate img { display: block; width: 100%; height: auto; }
+  figcaption { margin-top: 14px; font-size: 14px; font-style: italic; line-height: 1.55; color: var(--ink-soft); }
+  figcaption a { color: var(--ink-soft); text-underline-offset: 3px; }
+  figcaption a:hover { color: var(--accent-hover); }
+
+  .eyebrow { margin: 0; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+  h1 { margin: 10px 0 6px; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 46px; line-height: 1.1; }
+  .byline { margin: 0 0 20px; font-size: 18px; font-style: italic; color: var(--ink-soft); }
+  .blurb { margin: 0 0 32px; max-width: 46ch; font-size: 18px; line-height: 1.6; color: var(--ink-soft); }
+
+  fieldset { margin: 0 0 26px; padding: 0; border: 0; }
+  legend { padding: 0; font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+  .options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .options input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .options label {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 9px 16px;
+    border: 1px solid var(--hairline);
+    font-size: 17px;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .options label:hover { border-color: var(--accent-hover); color: var(--accent-hover); }
+  .options input:checked + label { border-color: var(--accent); background: var(--accent); color: var(--accent-text); }
+  .options input:focus-visible + label { outline: 2px solid var(--accent-hover); outline-offset: 2px; }
+  .options input:disabled + label { opacity: 0.35; cursor: not-allowed; }
+  .options input:disabled + label:hover { border-color: var(--hairline); color: var(--ink); }
+  .opt-price { font-size: 14px; opacity: 0.75; }
+
+  .swatch { display: inline-block; width: 13px; height: 13px; border: 1px solid rgba(43, 33, 24, 0.35); }
+  .swatch-black { background: #1c1a17; }
+  .swatch-white { background: #f4f1ea; }
+  .swatch-red-oak { background: #b5703c; }
+
+  .note { margin: 10px 0 0; font-size: 15px; font-style: italic; color: var(--ink-soft); }
+  fieldset[hidden] { display: none; }
+
+  .summary { border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); padding: 18px 0; margin-bottom: 24px; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 18px; line-height: 1.9; color: var(--ink-soft); }
+  .row.total { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 26px; color: var(--ink); margin-top: 6px; }
+  .row .label { max-width: 30ch; }
+
+  .buy {
+    display: inline-block;
+    padding: 15px 42px;
+    background: var(--accent);
+    color: var(--accent-text);
+    border: 1px solid var(--accent);
+    font-family: 'EB Garamond', serif;
+    font-size: 19px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .buy:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .buy:focus-visible { outline: 2px solid var(--accent-hover); outline-offset: 3px; }
+
+  .delivery { margin: 18px 0 0; font-size: 17px; line-height: 1.6; color: var(--ink-soft); }
+  .delivery strong { font-weight: 500; color: var(--ink); }
+
+  footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--hairline);
+    font-family: 'EB Garamond', serif; font-weight: 500; font-size: 17px;
+  }
+  .footer-left { display: flex; gap: 28px; }
+  footer a { color: var(--ink); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+  .mark { height: 48px; width: auto; display: block; }
+
+  .toast {
+    position: fixed; left: 0; top: 0;
+    transform: translate(-50%, 2px);
+    color: var(--ink-soft);
+    font-family: 'EB Garamond', serif;
+    font-weight: 400; font-style: italic; font-size: 13px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 900px) {
+    .page { padding: 32px 32px 48px; }
+    .product { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 20px 20px 40px; }
+    .nav-mark { display: block; height: 56px; }
+    .wordmark { display: none; }
+    .hamburger { display: flex; }
+    .nav-left {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      flex-direction: column;
+      gap: 0;
+      min-width: 180px;
+      padding: 8px 20px;
+      background: var(--bg);
+      border: 1px solid rgba(43, 33, 24, 0.15);
+      border-radius: 4px;
+      z-index: 50;
+    }
+    .nav-left.open { display: flex; }
+    .nav-left a { padding: 12px 0; font-size: 18px; border-bottom: 1px solid rgba(43, 33, 24, 0.1); }
+    .nav-left a:last-child { border-bottom: none; }
+
+    .plate { padding: 14px; }
+    h1 { font-size: 34px; }
+    .blurb { font-size: 17px; }
+    .buy { display: block; width: 100%; text-align: center; }
+    footer .mark { display: none; }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <nav>
+      <img class="nav-mark" src="../logo.png" alt="Compostela logo">
+      <div class="nav-left" id="navLeft">
+        <a href="./">Shop Gallery</a>
+        <a href="#">Journaling</a>
+        <a href="#">Daily Prayer</a>
+        <a href="#">Podcast</a>
+        <a href="#">Development</a>
+      </div>
+      <div class="wordmark"><a href="../index.html">Compostela</a></div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-expanded="false" aria-controls="navLeft">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <p class="crumb"><a href="../index.html">Compostela</a> &nbsp;/&nbsp; Gallery &nbsp;/&nbsp; The Storm on the Sea of Galilee</p>
+
+    <div class="product">
+      <figure>
+        <div class="plate">
+          <img src="images/storm-on-the-sea-of-galilee.jpg"
+               alt="Rembrandt's The Storm on the Sea of Galilee: a small boat pitched on a breaking wave, its sail straining, the disciples struggling at the rigging while Christ sits calm at the stern.">
+        </div>
+        <figcaption>
+          Rembrandt Harmenszoon van Rijn, <em>The Storm on the Sea of Galilee</em>, 1633.
+          Oil on canvas, 160 &times; 128 cm. Public domain reproduction courtesy of
+          <a href="https://commons.wikimedia.org/wiki/File:Rembrandt_Christ_in_the_Storm_on_the_Lake_of_Galilee.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>.
+        </figcaption>
+      </figure>
+
+      <div class="product-detail">
+        <p class="eyebrow">Compostela Gallery</p>
+        <h1>The Storm on the Sea of Galilee</h1>
+        <p class="byline">Rembrandt van Rijn &middot; 1633</p>
+        <p class="blurb">
+          Rembrandt's only seascape, and his reading of Mark 4:35&ndash;41. Thirteen men fight
+          the rigging of a boat driven up the face of a wave; a fourteenth sits at the stern,
+          unhurried. The whole picture is built so the light falls where the storm is loudest.
+          A refuge from the storms, hung on your wall.
+        </p>
+
+        <fieldset id="sizeField">
+          <legend>Size</legend>
+          <div class="options">
+            <input type="radio" name="size" id="size-5x7" value="5x7" checked>
+            <label for="size-5x7">5&quot; &times; 7&quot; <span class="opt-price">$9.99</span></label>
+
+            <input type="radio" name="size" id="size-8x10" value="8x10">
+            <label for="size-8x10">8&quot; &times; 10&quot; <span class="opt-price">$15.99</span></label>
+
+            <input type="radio" name="size" id="size-18x24" value="18x24">
+            <label for="size-18x24">18&quot; &times; 24&quot; <span class="opt-price">$19.99</span></label>
+
+            <input type="radio" name="size" id="size-24x36" value="24x36">
+            <label for="size-24x36">24&quot; &times; 36&quot; <span class="opt-price">$29.99</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset id="frameField">
+          <legend>Frame</legend>
+          <div class="options">
+            <input type="radio" name="frame" id="frame-no" value="no" checked>
+            <label for="frame-no">Unframed print</label>
+
+            <input type="radio" name="frame" id="frame-yes" value="yes">
+            <label for="frame-yes">Framed <span class="opt-price" id="framedPrice"></span></label>
+          </div>
+          <p class="note" id="frameNote" hidden>Framing is not offered at 5&quot; &times; 7&quot;.</p>
+        </fieldset>
+
+        <fieldset id="colorField" hidden>
+          <legend>Frame colour</legend>
+          <div class="options">
+            <input type="radio" name="color" id="color-black" value="black" checked>
+            <label for="color-black"><span class="swatch swatch-black"></span>Black</label>
+
+            <input type="radio" name="color" id="color-white" value="white">
+            <label for="color-white"><span class="swatch swatch-white"></span>White</label>
+
+            <input type="radio" name="color" id="color-red-oak" value="red-oak">
+            <label for="color-red-oak"><span class="swatch swatch-red-oak"></span>Red Oak</label>
+          </div>
+        </fieldset>
+
+        <div class="summary" aria-live="polite">
+          <div class="row"><span class="label" id="itemLabel">Print</span><span id="itemPrice">$9.99</span></div>
+          <div class="row"><span class="label">Shipping</span><span id="shipPrice">$4.99</span></div>
+          <div class="row total"><span class="label">Total</span><span id="totalPrice">$14.98</span></div>
+        </div>
+
+        <a class="buy" id="buyBtn" href="#" role="button">Buy this print</a>
+
+        <p class="delivery">
+          <strong>7&ndash;10 days from order to delivery.</strong><br>
+          Printed to order, then shipped. Every size is printed to the painting's own
+          proportions, so nothing is cropped. Prices are in USD; shipping is shown above
+          and charged at checkout.
+        </p>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-left">
+        <a href="../index.html">2026</a>
+      </div>
+      <img class="mark" src="../logo.png" alt="Compostela logo">
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Coming Soon!</div>
+
+  <script src="stripe-config.js"></script>
+  <script>
+    // Prices in cents so the arithmetic stays exact.
+    var SIZES = {
+      '5x7':   { label: '5" × 7"',   print: 999,  ship: 499, framed: null },
+      '8x10':  { label: '8" × 10"',  print: 1599, ship: 499, framed: { print: 3599, ship: 1049 } },
+      '18x24': { label: '18" × 24"', print: 1999, ship: 499, framed: { print: 5999, ship: 1399 } },
+      '24x36': { label: '24" × 36"', print: 2999, ship: 799, framed: { print: 9999, ship: 2999 } }
+    };
+    var COLOR_LABELS = { 'black': 'Black', 'white': 'White', 'red-oak': 'Red Oak' };
+
+    var frameField = document.getElementById('frameField');
+    var frameNote = document.getElementById('frameNote');
+    var frameYes = document.getElementById('frame-yes');
+    var frameNo = document.getElementById('frame-no');
+    var framedPrice = document.getElementById('framedPrice');
+    var colorField = document.getElementById('colorField');
+    var itemLabel = document.getElementById('itemLabel');
+    var itemPrice = document.getElementById('itemPrice');
+    var shipPrice = document.getElementById('shipPrice');
+    var totalPrice = document.getElementById('totalPrice');
+    var buyBtn = document.getElementById('buyBtn');
+
+    function money(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+
+    function selected(name) {
+      var el = document.querySelector('input[name="' + name + '"]:checked');
+      return el ? el.value : null;
+    }
+
+    // Prefer a per-colour Payment Link when one is configured, otherwise
+    // fall back to the one-link-per-size setup. See stripe-config.js.
+    function paymentLinkFor(sku) {
+      var cfg = window.COMPOSTELA_STRIPE || {};
+      var links = cfg.paymentLinks || {};
+      var parts = sku.split('-');
+      for (var i = parts.length; i > 0; i--) {
+        var key = parts.slice(0, i).join('-');
+        if (links[key]) { return links[key]; }
+      }
+      return '';
+    }
+
+    function update() {
+      var sizeKey = selected('size');
+      var size = SIZES[sizeKey];
+      var canFrame = size.framed !== null;
+
+      // 5" x 7" has no frame option at all.
+      frameYes.disabled = !canFrame;
+      frameNote.hidden = canFrame;
+      if (!canFrame && frameYes.checked) { frameNo.checked = true; }
+      framedPrice.textContent = canFrame ? money(size.framed.print) : '';
+
+      var isFramed = canFrame && frameYes.checked;
+      colorField.hidden = !isFramed;
+
+      var priced = isFramed ? size.framed : size;
+      var color = selected('color');
+
+      var sku = sizeKey + (isFramed ? '-framed-' + color : '');
+      itemLabel.textContent = isFramed
+        ? size.label + ' framed — ' + COLOR_LABELS[color]
+        : size.label + ' print';
+      itemPrice.textContent = money(priced.print);
+      shipPrice.textContent = money(priced.ship);
+      totalPrice.textContent = money(priced.print + priced.ship);
+
+      var link = paymentLinkFor(sku);
+      if (link) {
+        // client_reference_id records the exact SKU on the Stripe payment.
+        var joiner = link.indexOf('?') === -1 ? '?' : '&';
+        buyBtn.href = link + joiner + 'client_reference_id=' + encodeURIComponent('storm-' + sku);
+        buyBtn.removeAttribute('data-unavailable');
+        buyBtn.textContent = 'Buy this print — ' + money(priced.print + priced.ship);
+      } else {
+        buyBtn.href = '#';
+        buyBtn.setAttribute('data-unavailable', 'true');
+        buyBtn.textContent = 'Buy this print — ' + money(priced.print + priced.ship);
+      }
+    }
+
+    document.querySelectorAll('input[name="size"], input[name="frame"], input[name="color"]')
+      .forEach(function (input) { input.addEventListener('change', update); });
+    update();
+
+    // ---- "Coming Soon!" toast, same behaviour as the home page ----
+    var toast = document.getElementById('toast');
+    var toastTimeout;
+    var hamburgerBtn = document.getElementById('hamburgerBtn');
+    var navLeft = document.getElementById('navLeft');
+
+    function closeMenu() {
+      navLeft.classList.remove('open');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function showToast(anchor) {
+      clearTimeout(toastTimeout);
+      var rect = anchor.getBoundingClientRect();
+      toast.style.left = (rect.left + rect.width / 2) + 'px';
+      toast.style.top = (rect.bottom + 6) + 'px';
+      toast.classList.add('show');
+      toastTimeout = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+    }
+
+    hamburgerBtn.addEventListener('click', function () {
+      var isOpen = navLeft.classList.toggle('open');
+      hamburgerBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (navLeft.classList.contains('open') && !navLeft.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
+    document.querySelectorAll('.nav-left a[href="#"]').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeMenu();
+        showToast(link);
+      });
+    });
+
+    buyBtn.addEventListener('click', function (e) {
+      if (buyBtn.getAttribute('data-unavailable') === 'true') {
+        e.preventDefault();
+        showToast(buyBtn);
+      }
+    });
+  </script>
+</body>
+</html>

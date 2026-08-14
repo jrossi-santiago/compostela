@@ -175,7 +175,7 @@
     <nav>
       <img class="nav-mark" src="logo.png" alt="Compostela logo">
       <div class="nav-left" id="navLeft">
-        <a href="#">Shop Gallery</a>
+        <a href="shop/">Shop Gallery</a>
         <a href="#">Journaling</a>
         <a href="#">Daily Prayer</a>
         <a href="#">Podcast</a>
@@ -267,7 +267,8 @@
       }
     });
 
-    document.querySelectorAll('.nav-left a, .footer-left a').forEach(function (link) {
+    // Only links without a real destination get the "Coming Soon!" popup.
+    document.querySelectorAll('.nav-left a[href="#"], .footer-left a[href="#"]').forEach(function (link) {
       link.addEventListener('click', function (e) {
         e.preventDefault();
         clearTimeout(toastTimeout);
