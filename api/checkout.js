@@ -1,4 +1,4 @@
-/* POST /api/checkout — creates an embedded Stripe Checkout Session.
+/* POST /api/checkout — creates a Stripe Checkout Session.
  *
  * The browser sends identifiers only: [{ slug, sizeId, frameId, qty }].
  * Prices are never accepted from the client; every amount charged is looked
@@ -6,18 +6,8 @@
  * use. Editing a price in the catalog changes what is charged. There are no
  * products or prices stored in the Stripe dashboard to keep in sync.
  *
- * The session is created with ui_mode 'embedded', so it mounts inside
- * checkout.html on our own domain rather than sending the customer to
- * checkout.stripe.com. The response carries the session's client secret and
- * the publishable key the page needs to mount it — both are public values by
- * design. The secret key never leaves this function.
- *
- * Requires two environment variables, set in the Vercel project settings and
- * never in this repository:
- *   STRIPE_SECRET_KEY       sk_… — signs the API call
- *   STRIPE_PUBLISHABLE_KEY  pk_… — handed to the browser to mount the form
- * Both must be from the same mode; a live secret with a test publishable key
- * fails at mount time with a confusing error.
+ * Requires the STRIPE_SECRET_KEY environment variable (set it in the Vercel
+ * project settings, never in this repository).
  */
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const pricing = require('../assets/pricing.js');
@@ -66,10 +56,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
-  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PUBLISHABLE_KEY) {
-    // Deployed without a key — say so plainly rather than 500-ing. The
-    // embedded form needs both, so a half-configured deploy fails here
-    // rather than with an opaque error once the page tries to mount.
+  if (!process.env.STRIPE_SECRET_KEY) {
+    // Deployed without the key — say so plainly rather than 500-ing.
     return res.status(503).json({
       error: 'Checkout is not configured yet.'
     });
@@ -107,12 +95,9 @@ module.exports = async function handler(req, res) {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      ui_mode: 'embedded',
       line_items: lineItems,
-      // Embedded sessions take a return_url and must not be given
-      // success_url or cancel_url. Stripe sends the customer here after
-      // payment, and thank-you.html reads the order back from it.
-      return_url: `${origin}/thank-you.html?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/thank-you.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/gallery.html`,
       shipping_address_collection: {
         allowed_countries: catalog.shipping.allowedCountries
       },
@@ -131,10 +116,7 @@ module.exports = async function handler(req, res) {
       }
     });
 
-    return res.status(200).json({
-      clientSecret: session.client_secret,
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
-    });
+    return res.status(200).json({ url: session.url });
   } catch (err) {
     console.error('Stripe session creation failed:', err);
     return res.status(502).json({

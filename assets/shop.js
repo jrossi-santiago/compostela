@@ -246,16 +246,43 @@ window.Shop = (function () {
     }, 300);
   }
 
-  /* Checkout happens on our own checkout.html, which reads this same basket
-     out of localStorage and mounts Stripe's form inside the page. Nothing is
-     passed in the URL — the basket is already where it needs to be. */
+  /* Hands the basket to /api/checkout, which prices it again server-side and
+     returns a Stripe Checkout URL to redirect to. */
   function checkout() {
     var button = document.getElementById('cartCheckout');
     if (!cart.length || button.disabled) return;
 
     button.disabled = true;
     button.textContent = 'Taking you to checkout…';
-    window.location.href = 'checkout.html';
+
+    function recover(message) {
+      button.disabled = false;
+      button.textContent = 'Proceed to checkout';
+      toast(message);
+    }
+
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: cart })
+    })
+      .then(function (response) {
+        return response.json().then(function (data) {
+          return { status: response.status, data: data };
+        });
+      })
+      .then(function (result) {
+        if (result.data && result.data.url) {
+          window.location.href = result.data.url;
+          return;
+        }
+        recover(result.data && result.data.error
+          ? result.data.error
+          : 'Checkout is unavailable right now.');
+      })
+      .catch(function () {
+        recover('Could not reach checkout. Check your connection and try again.');
+      });
   }
 
   function wireChrome() {
@@ -323,13 +350,9 @@ window.Shop = (function () {
   return {
     catalog: catalog,
     init: init,
-    // A copy of the basket, for pages that render it without editing it.
-    items: function () { return cart.slice(); },
     escapeHTML: escapeHTML,
     // Pricing is re-exported so pages have one object to talk to.
     money: pricing.money,
-    moneyExact: pricing.moneyExact,
-    resolveCart: pricing.resolveCart,
     workBySlug: pricing.workBySlug,
     sizeById: pricing.sizeById,
     frameById: pricing.frameById,
