@@ -147,8 +147,12 @@ window.Shop = (function () {
       '  <div class="drawer__body" id="cartBody"></div>',
       '  <footer class="drawer__foot">',
       '    <div class="drawer__row"><span class="eyebrow">Subtotal</span>',
-      '      <span class="display" style="font-size:22px" id="cartSubtotal">$0</span></div>',
-      '    <p class="drawer__note">Shipping is calculated at the next step.</p>',
+      '      <span id="cartSubtotal">$0</span></div>',
+      '    <div class="drawer__row"><span class="eyebrow">Shipping</span>',
+      '      <span id="cartShipping">$0</span></div>',
+      '    <div class="drawer__row drawer__row--total"><span class="eyebrow">Total</span>',
+      '      <span class="display" style="font-size:22px" id="cartTotal">$0</span></div>',
+      '    <p class="drawer__note" id="cartNote"></p>',
       '    <button class="btn btn--block" type="button" id="cartCheckout">Proceed to checkout</button>',
       '  </footer>',
       '</aside>',
@@ -179,7 +183,7 @@ window.Shop = (function () {
               '</a>' +
               '<div class="cart-line__meta">' +
                 escapeHTML(line.size.label) + ' · ' + escapeHTML(line.size.dimensions) + '<br>' +
-                escapeHTML(line.frame.label) +
+                escapeHTML(line.frame.label) + (pricing.isFramed(line.frame.id) ? ' frame' : '') +
               '</div>' +
               '<div class="cart-line__foot">' +
                 '<span class="qty">' +
@@ -196,7 +200,14 @@ window.Shop = (function () {
       }).join('');
     }
 
+    var ship = catalog.shipping;
     document.getElementById('cartSubtotal').textContent = pricing.money(basket.total);
+    document.getElementById('cartShipping').textContent = pricing.money(basket.shipping);
+    document.getElementById('cartTotal').textContent = pricing.money(basket.grandTotal);
+    document.getElementById('cartNote').textContent = cart.length
+      ? 'One shipping charge per order, at the highest rate in the basket. ' +
+        ship.minDays + '–' + ship.maxDays + ' days from order to delivery.'
+      : '';
     document.getElementById('cartCheckout').disabled = !cart.length;
   }
 
@@ -347,6 +358,11 @@ window.Shop = (function () {
     frameById: pricing.frameById,
     collectionLabel: pricing.collectionLabel,
     availableSizes: pricing.availableSizes,
+    availableFrames: pricing.availableFrames,
+    sizeCanBeFramed: pricing.sizeCanBeFramed,
+    framePrice: pricing.framePrice,
+    shippingFor: pricing.shippingFor,
+    isFramed: pricing.isFramed,
     isSizeSoldOut: pricing.isSizeSoldOut,
     isSoldOut: pricing.isSoldOut,
     priceFrom: pricing.priceFrom,

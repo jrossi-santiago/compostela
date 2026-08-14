@@ -33,6 +33,40 @@
   function sizeById(id) { return byId(catalog.sizes, id); }
   function frameById(id) { return byId(catalog.frames, id); }
 
+  /* What framing costs on top of the print, for a given size. Returns null
+     when that size is not offered framed at all — 5 × 7, as it stands. A
+     frame may carry its own per-size map to override the shared one. */
+  function framePrice(sizeId, frameId) {
+    var frame = frameById(frameId);
+    if (!frame) return null;
+    if (frame.id === 'none') return 0;
+    var table = frame.price || catalog.framePrices;
+    var amount = table[sizeId];
+    return amount == null ? null : amount;
+  }
+
+  function isFramed(frameId) { return frameId !== 'none'; }
+
+  /* The frame colours offered at a size. Always includes 'Unframed print';
+     at a size with no framing that is the only entry. */
+  function availableFrames(sizeId) {
+    return catalog.frames.filter(function (frame) {
+      return framePrice(sizeId, frame.id) != null;
+    });
+  }
+
+  function sizeCanBeFramed(sizeId) {
+    return availableFrames(sizeId).length > 1;
+  }
+
+  /* Shipping for one piece, by size and whether it is framed. */
+  function shippingFor(sizeId, frameId) {
+    var rate = catalog.shipping.rates[sizeId];
+    if (!rate) return null;
+    var amount = isFramed(frameId) ? rate.framed : rate.unframed;
+    return amount == null ? null : amount;
+  }
+
   function collectionLabel(id) {
     var found = byId(catalog.collections, id);
     return found ? found.label : '';
@@ -93,22 +127,35 @@
     var frame = frameById(input.frameId);
     if (!frame) return { ok: false, error: 'Unknown framing option.' };
 
+    var framing = framePrice(size.id, frame.id);
+    if (framing == null) {
+      return { ok: false, error: work.title + ' is not framed at ' + size.dimensions + '.' };
+    }
+
+    var shipping = shippingFor(size.id, frame.id);
+    if (shipping == null) {
+      return { ok: false, error: 'We cannot ship that combination yet.' };
+    }
+
     var qty = Math.floor(Number(input.qty));
     if (!isFinite(qty) || qty < 1) qty = 1;
     if (qty > MAX_QTY) qty = MAX_QTY;
 
-    var unitAmount = work.prices[size.id] + frame.price;
+    var unitAmount = work.prices[size.id] + framing;
 
     return {
       ok: true,
       work: work,
       size: size,
       frame: frame,
+      framing: framing,
+      shipping: shipping,
       qty: qty,
       unitAmount: unitAmount,
       total: unitAmount * qty,
       // What the customer sees on the Stripe receipt.
-      description: size.label + ' — ' + size.dimensions + ' · ' + frame.label
+      description: size.label + ' — ' + size.dimensions + ' · ' + frame.label +
+        (isFramed(frame.id) ? ' frame' : '')
     };
   }
 
@@ -116,10 +163,10 @@
      failing on the first, so the browser can explain itself properly. */
   function resolveCart(items) {
     if (!Array.isArray(items) || !items.length) {
-      return { ok: false, errors: ['The basket is empty.'], lines: [], total: 0 };
+      return { ok: false, errors: ['The basket is empty.'], lines: [], total: 0, shipping: 0, grandTotal: 0 };
     }
     if (items.length > 50) {
-      return { ok: false, errors: ['Too many items in one order.'], lines: [], total: 0 };
+      return { ok: false, errors: ['Too many items in one order.'], lines: [], total: 0, shipping: 0, grandTotal: 0 };
     }
 
     var lines = [];
@@ -131,11 +178,20 @@
       else errors.push(line.error);
     });
 
+    var subtotal = lines.reduce(function (sum, line) { return sum + line.total; }, 0);
+    // One order, one shipping charge: the basket pays the highest rate it
+    // contains rather than the sum of them.
+    var shipping = lines.reduce(function (highest, line) {
+      return Math.max(highest, line.shipping);
+    }, 0);
+
     return {
       ok: errors.length === 0 && lines.length > 0,
       errors: errors,
       lines: lines,
-      total: lines.reduce(function (sum, line) { return sum + line.total; }, 0)
+      total: subtotal,
+      shipping: shipping,
+      grandTotal: subtotal + shipping
     };
   }
 
@@ -155,6 +211,11 @@
     frameById: frameById,
     collectionLabel: collectionLabel,
     availableSizes: availableSizes,
+    availableFrames: availableFrames,
+    sizeCanBeFramed: sizeCanBeFramed,
+    framePrice: framePrice,
+    shippingFor: shippingFor,
+    isFramed: isFramed,
     isSizeSoldOut: isSizeSoldOut,
     isSoldOut: isSoldOut,
     priceFrom: priceFrom,

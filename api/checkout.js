@@ -32,18 +32,22 @@ function originOf(req) {
   return `${proto}://${host}`;
 }
 
-function shippingOptions() {
-  return catalog.shipping.rates.map((rate) => ({
+/* Shipping is priced per piece by size and framing, so the rate depends on
+   what is in the basket. `resolveCart` has already picked the single rate the
+   order pays; this turns it into the one option Stripe offers. */
+function shippingOptions(basket) {
+  const ship = catalog.shipping;
+  return [{
     shipping_rate_data: {
       type: 'fixed_amount',
-      display_name: rate.label,
-      fixed_amount: { amount: rate.price, currency: catalog.currency },
+      display_name: ship.label,
+      fixed_amount: { amount: basket.shipping, currency: catalog.currency },
       delivery_estimate: {
-        minimum: { unit: 'business_day', value: rate.minDays },
-        maximum: { unit: 'business_day', value: rate.maxDays }
+        minimum: { unit: 'day', value: ship.minDays },
+        maximum: { unit: 'day', value: ship.maxDays }
       }
     }
-  }));
+  }];
 }
 
 module.exports = async function handler(req, res) {
@@ -97,7 +101,7 @@ module.exports = async function handler(req, res) {
       shipping_address_collection: {
         allowed_countries: catalog.shipping.allowedCountries
       },
-      shipping_options: shippingOptions(),
+      shipping_options: shippingOptions(basket),
       billing_address_collection: 'auto',
       // Stripe Tax has to be switched on in the dashboard first; leave the
       // env var unset until it is, or every session will fail.

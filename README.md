@@ -39,20 +39,54 @@ To add a work: append one object to `works`, drop in `assets/art/<slug>.jpg`.
 
 Amounts are **integer cents** — `4500` is $45.00. Never write decimals.
 
+## How a piece is priced
+
+Three numbers make up what a customer pays, and each lives in exactly one
+place in `catalog.js`:
+
+| part | where | varies by |
+|---|---|---|
+| print | `works[].prices` | work, size |
+| framing | `framePrices` | size |
+| shipping | `shipping.rates` | size, framed or not |
+
+Framing is an **add-on**, not a second price: a $15.99 8 × 10 with the $20.00
+add-on is the $35.99 framed piece. A size left out of `framePrices` is not
+offered framed at all — that is the whole mechanism behind 5 × 7 being
+print-only, and `shipping.rates` marks the same size `framed: null` to match.
+
+A basket pays **one** shipping charge, the highest rate it contains, so two
+prints in an order ship as one order.
+
+### The Storm on the Sea of Galilee — confirmed
+
+| size | print | framed | ship (print) | ship (framed) |
+|---|---|---|---|---|
+| 5 × 7   |  $9.99 | —       | $4.99 | — |
+| 8 × 10  | $15.99 | $35.99  | $4.99 | $10.49 |
+| 18 × 24 | $19.99 | $59.99  | $4.99 | $13.99 |
+| 24 × 36 | $29.99 | $99.99  | $7.99 | $29.99 |
+
+Frames come in black, white or red oak, all at the same add-on. Delivery is
+7–10 days from order, set once in `shipping.minDays` / `maxDays` and used by
+the product page, the basket and the Stripe delivery estimate alike.
+
 ## Still to fill in
 
-`assets/catalog.js` has a block near the top marked `⚠ NOT YET CONFIRMED`.
-It holds placeholder values I wrote so the pages would function. Replace all
-of it before taking an order:
+`assets/catalog.js` has a block near the top marked `⚠ NOT YET CONFIRMED`:
 
-1. **Prices** — the size ladders and the frame surcharges.
-2. **`policies.shipping` / `policies.returns`** — currently deliberately
-   vague. Write the real terms.
-3. **`shipping.rates`** — what you actually charge, in cents.
-4. **`shipping.allowedCountries`** — set to `['US']` only. Add ISO codes once
+1. **The placeholder price ladders.** `priceLadder.standard` and
+   `priceLadder.large` are invented numbers, and the other twelve works all
+   still use them. Only The Storm on the Sea of Galilee has confirmed prices,
+   written inline on the work itself. Replace the ladders before selling
+   anything else — as it stands the placeholders run well above the one work
+   that is priced for real.
+2. **`policies.returns`** — currently deliberately vague. Write the real terms.
+3. **`shipping.allowedCountries`** — set to `['US']` only. Add ISO codes once
    international rates and duties are settled.
-5. **Artwork** — see `assets/art/README.md` for the naming convention and
-   image specs.
+4. **Artwork** — only `the-storm-on-the-sea-of-galilee.jpg` is in
+   `assets/art/`; the rest draw a placeholder plate until a file lands. See
+   `assets/art/README.md` for the naming convention and image specs.
 
 ## Deploying (Vercel)
 

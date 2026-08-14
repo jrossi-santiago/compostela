@@ -62,12 +62,21 @@
     display: flex;
     align-items: baseline;
     gap: 14px;
-    padding-bottom: 26px;
-    border-bottom: 1px solid var(--hairline-soft);
+    padding-bottom: 10px;
   }
 
   .price__amount { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 34px; line-height: 1; }
   .price__note { font-size: 14px; color: var(--ink-soft); font-style: italic; }
+
+  .price__ship {
+    margin: 0;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--hairline-soft);
+    font-size: 15px;
+    color: var(--ink-soft);
+  }
+
+  .price__ship b { font-weight: 500; color: var(--ink); }
 
   .options { display: grid; gap: 20px; padding: 26px 0 24px; }
   .options__row { display: grid; grid-template-columns: 1fr 132px; gap: 16px; align-items: end; }
@@ -274,13 +283,12 @@
       var firstInStock = sizes.filter(function (s) { return !Shop.isSizeSoldOut(work, s.id); })[0];
       var state = {
         sizeId: (firstInStock || sizes[0]).id,
-        frameId: Shop.catalog.frames[0].id,
+        frameId: 'none',
         qty: 1
       };
 
       function currentPrice() {
-        var frame = Shop.frameById(state.frameId);
-        return work.prices[state.sizeId] + frame.price;
+        return work.prices[state.sizeId] + Shop.framePrice(state.sizeId, state.frameId);
       }
 
       function sizeOptions() {
@@ -294,11 +302,14 @@
         }).join('');
       }
 
+      /* Framing is offered by size — 5 × 7 is print-only — so this is rebuilt
+         whenever the size changes rather than rendered once. */
       function frameOptions() {
-        return Shop.catalog.frames.map(function (frame) {
+        return Shop.availableFrames(state.sizeId).map(function (frame) {
+          var addOn = Shop.framePrice(state.sizeId, frame.id);
           return '<option value="' + frame.id + '"' + (frame.id === state.frameId ? ' selected' : '') + '>' +
                  Shop.escapeHTML(frame.label) +
-                 (frame.price ? ' — add ' + Shop.money(frame.price) : '') +
+                 (addOn ? ' frame — add ' + Shop.money(addOn) : '') +
                  '</option>';
         }).join('');
       }
@@ -361,6 +372,7 @@
               '<span class="price__amount" id="priceAmount"></span>' +
               '<span class="price__note">Printed to order</span>' +
             '</div>' +
+            '<p class="price__ship" id="shipLine"></p>' +
 
             '<div class="options">' +
               '<label class="field"><span class="field__label">Size</span>' +
@@ -404,6 +416,7 @@
       /* ---------- interaction ---------- */
 
       var priceAmount = document.getElementById('priceAmount');
+      var shipLine = document.getElementById('shipLine');
       var stockLine = document.getElementById('stockLine');
       var addBtn = document.getElementById('addToCart');
       var qtyValue = document.getElementById('qtyValue');
@@ -412,16 +425,42 @@
 
       function sync() {
         var soldOut = Shop.isSizeSoldOut(work, state.sizeId);
+        var shipping = Shop.shippingFor(state.sizeId, state.frameId);
+
         priceAmount.textContent = soldOut ? 'Sold out' : Shop.money(currentPrice() * state.qty);
         qtyValue.textContent = state.qty;
         addBtn.disabled = soldOut;
         addBtn.textContent = soldOut ? 'Sold out in this size' : 'Add to basket';
+
+        if (soldOut) {
+          shipLine.textContent = '';
+        } else {
+          shipLine.innerHTML =
+            Shop.money(shipping) + ' shipping · <b>' +
+            Shop.money(currentPrice() * state.qty + shipping) + '</b> delivered, in ' +
+            Shop.catalog.shipping.minDays + '–' + Shop.catalog.shipping.maxDays + ' days';
+        }
+
         stockLine.textContent = soldOut
           ? 'This size has sold out. Another size may still be available.'
           : policies.stockNote;
       }
 
-      sizeSelect.addEventListener('change', function () { state.sizeId = sizeSelect.value; sync(); });
+      /* Changing size can withdraw the chosen frame — nothing is framed at
+         5 × 7 — so the frame list is rebuilt and the selection falls back to
+         the unframed print rather than silently keeping an unbuyable one. */
+      function syncFrames() {
+        if (Shop.framePrice(state.sizeId, state.frameId) == null) state.frameId = 'none';
+        frameSelect.innerHTML = frameOptions();
+        frameSelect.value = state.frameId;
+        frameSelect.disabled = !Shop.sizeCanBeFramed(state.sizeId);
+      }
+
+      sizeSelect.addEventListener('change', function () {
+        state.sizeId = sizeSelect.value;
+        syncFrames();
+        sync();
+      });
       frameSelect.addEventListener('change', function () { state.frameId = frameSelect.value; sync(); });
 
       document.getElementById('qtyDown').addEventListener('click', function () {
@@ -458,6 +497,7 @@
         if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
       });
 
+      syncFrames();
       sync();
     })();
   </script>

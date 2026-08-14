@@ -434,7 +434,13 @@ a { color: inherit; }
   margin-bottom: 6px;
 }
 
-.drawer__note { font-size: 14px; color: var(--ink-soft); margin: 0 0 18px; }
+.drawer__row--total {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+.drawer__note { font-size: 14px; color: var(--ink-soft); margin: 8px 0 18px; }
 
 /* ---------- toast ---------- */
 

@@ -20,20 +20,42 @@
 })(typeof self !== 'undefined' ? self : this, function () {
 
   /* =========================================================================
-   * ⚠ NOT YET CONFIRMED — everything in this block is a placeholder I wrote
-   * to make the pages functional. Replace before taking a single order.
+   * ⚠ NOT YET CONFIRMED — the price ladders in this block are placeholders,
+   * used by every work EXCEPT The Storm on the Sea of Galilee, whose prices
+   * are confirmed and written inline on the work itself further down.
+   * Replace these before taking an order for anything else.
    * ======================================================================= */
 
   // Prices in integer cents. 4500 === $45.00. Never use decimals here.
   var priceLadder = {
-    standard: { sm: 4500, md: 9500, lg: 16500 },
-    large:    { sm: 5500, md: 11500, lg: 18500 }
+    standard: { '5x7': 2500, '8x10': 4500, '18x24': 9500, '24x36': 16500 },
+    large:    { '5x7': 3000, '8x10': 5500, '18x24': 11500, '24x36': 18500 }
   };
 
+  /* =========================================================================
+   * End of the unconfirmed block. Everything below is confirmed or structure.
+   * ======================================================================= */
+
+  /* Framing add-on, in cents, by size. It is charged on top of the print
+   * price, so a framed 8 × 10 of a $15.99 print comes to $35.99.
+   *
+   * A size missing from this map is not offered framed at all — that is how
+   * 5 × 7 ends up print-only, rather than by a flag somewhere else.
+   */
+  var framePrices = {
+    '8x10': 2000,
+    '18x24': 4000,
+    '24x36': 7000
+  };
+
+  /* Frame colours. The add-on above is the same whichever colour is chosen,
+   * so colour carries no price of its own. A frame may set `price` to a
+   * per-size map of its own if one ever costs more than the others. */
   var frames = [
-    { id: 'none', label: 'Unframed print', price: 0 },
-    { id: 'oak', label: 'Gilded oak frame', price: 8500 },
-    { id: 'walnut', label: 'Dark walnut frame', price: 9500 }
+    { id: 'none', label: 'Unframed print' },
+    { id: 'black', label: 'Black', swatch: '#1c1a17' },
+    { id: 'white', label: 'White', swatch: '#f4f1ea' },
+    { id: 'red-oak', label: 'Red oak', swatch: '#b5703c' }
   ];
 
   // Shown in the product page accordions AND used as the Stripe description.
@@ -43,12 +65,13 @@
       'Archival pigment print on 310gsm cotton rag, matte finish. Printed to ' +
       'order. Borders sized for framing without trimming.',
     framing:
-      'Frames are made to the print’s dimensions in gilded oak or dark ' +
-      'walnut, glazed with UV-filtering acrylic and delivered wired and ready ' +
-      'to hang.',
+      'Frames are made to the print’s dimensions in black, white or red oak, ' +
+      'glazed with UV-filtering acrylic and delivered wired and ready to ' +
+      'hang. The smallest size is sold as a print only.',
     shipping: [
-      'Prints are made when you order, so allow a few working days before dispatch.',
-      'Unframed prints ship rolled in a rigid tube; framed pieces ship boxed and corner-protected.'
+      'Seven to ten days from order to delivery. Prints are made when you order, so the first few of those days are spent at the press.',
+      'Unframed prints ship rolled in a rigid tube; framed pieces ship boxed and corner-protected.',
+      'Shipping is charged by size, and framed pieces cost more to send than rolled prints. The rate for what you have selected is shown with the price.'
     ],
     returns: [
       'If a piece arrives damaged or is not what you expected, write to us and we will replace it or refund it.'
@@ -57,32 +80,39 @@
     stockNote: 'Printed and dispatched to order.'
   };
 
-  // Stripe reads this at checkout. Rates are in cents, same as prices.
-  //
-  // `allowedCountries` is deliberately US-only until international duties and
-  // rates are settled — an empty international policy is worse than not
-  // shipping there yet. Add ISO codes ('CA', 'GB', 'IE', ...) when ready.
+  /* Shipping, in cents, by size and by whether the piece is framed. Stripe
+   * reads this at checkout.
+   *
+   * A basket pays the single highest rate it contains rather than the sum —
+   * two prints in one order still ship as one order. `framed: null` marks a
+   * size that is never framed, and should agree with `framePrices` above.
+   *
+   * `allowedCountries` is deliberately US-only until international duties and
+   * rates are settled — an empty international policy is worse than not
+   * shipping there yet. Add ISO codes ('CA', 'GB', 'IE', ...) when ready.
+   */
   var shipping = {
     allowedCountries: ['US'],
-    rates: [
-      {
-        id: 'standard',
-        label: 'Standard shipping',
-        price: 0,
-        minDays: 3,
-        maxDays: 8
-      }
-    ]
+    label: 'Standard shipping',
+    // 7–10 days from order to delivery, calendar days rather than working
+    // days — this is what the product page promises.
+    minDays: 7,
+    maxDays: 10,
+    rates: {
+      '5x7':   { unframed: 499, framed: null },
+      '8x10':  { unframed: 499, framed: 1049 },
+      '18x24': { unframed: 499, framed: 1399 },
+      '24x36': { unframed: 799, framed: 2999 }
+    }
   };
 
-  /* =========================================================================
-   * End of the unconfirmed block. Everything below is structure.
-   * ======================================================================= */
-
+  /* Size ids are the dimensions themselves, so a price ladder, a shipping
+   * rate and a ?size= parameter all read the same and cannot be mixed up. */
   var sizes = [
-    { id: 'sm', label: 'Small', dimensions: '8 × 10 in' },
-    { id: 'md', label: 'Medium', dimensions: '16 × 20 in' },
-    { id: 'lg', label: 'Large', dimensions: '24 × 36 in' }
+    { id: '5x7', label: 'Small', dimensions: '5 × 7 in' },
+    { id: '8x10', label: 'Medium', dimensions: '8 × 10 in' },
+    { id: '18x24', label: 'Large', dimensions: '18 × 24 in' },
+    { id: '24x36', label: 'Extra large', dimensions: '24 × 36 in' }
   ];
 
   var collections = [
@@ -96,7 +126,7 @@
   /* Per-work fields:
    *   slug        file name in assets/art/, and the ?work= URL
    *   prices      a price ladder, or an inline { sm, md, lg } of your own
-   *   soldOut     array of size ids that are unavailable, e.g. ['lg']
+   *   soldOut     array of size ids that are unavailable, e.g. ['24x36']
    *   featured    surfaces first under the default gallery sort
    *   blurb       one line, used for the page's meta description
    *   description the paragraph on the product page
@@ -110,7 +140,9 @@
       year: '1633',
       medium: 'Oil on canvas',
       collection: 'gospels',
-      prices: priceLadder.large,
+      // Confirmed pricing — not from a placeholder ladder. Framed totals come
+      // out at $35.99 / $59.99 / $99.99 once framePrices is added on.
+      prices: { '5x7': 999, '8x10': 1599, '18x24': 1999, '24x36': 2999 },
       featured: true,
       blurb: 'Rembrandt’s only seascape, and the most famous painting nobody can see.',
       description: 'Mark 4 verses 35 to 41, painted when Rembrandt was twenty-seven: the boat pitched almost vertical, the sail already splitting, and Christ at the stern being woken by men who have run out of nerve. Count the figures and there are fourteen aboard where the Gospel has thirteen — the one gripping a rope and looking straight out at you is Rembrandt himself. The canvas was cut from its frame at the Isabella Stewart Gardner Museum in 1990 and has never been recovered. The empty frame still hangs in the room it was taken from.'
@@ -204,7 +236,7 @@
       medium: 'Oil on wood',
       collection: 'passion',
       prices: priceLadder.large,
-      soldOut: ['lg'],
+      soldOut: ['24x36'],
       blurb: 'Raphael’s last painting: glory above, and a crowd below that cannot heal anyone.',
       description: 'Two registers held in one frame — the mountain lit white, the confusion at its foot. Raphael was still working on it when he died, and it hung above him at his funeral. The lower half is why it is a great painting and not merely a beautiful one.'
     },
@@ -259,6 +291,7 @@
     currency: 'usd',
     sizes: sizes,
     frames: frames,
+    framePrices: framePrices,
     collections: collections,
     policies: policies,
     shipping: shipping,
