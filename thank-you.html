@@ -180,14 +180,8 @@
 
       var sessionId = new URLSearchParams(window.location.search).get('session_id');
 
-      /* Receipts always show the cents, even on a whole-dollar amount — the
-         site's own money() drops them, which reads oddly on an order total. */
-      function money(cents, currency) {
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: (currency || 'usd').toUpperCase()
-        }).format((cents || 0) / 100);
-      }
+      // Receipts always show the cents. See moneyExact in pricing.js.
+      var money = Shop.moneyExact;
 
       function longDate(ms) {
         return new Date(ms).toLocaleDateString('en-US', {

@@ -195,12 +195,23 @@
     };
   }
 
+  /* Browsing prices. Drops the cents on a whole-dollar amount, so the gallery
+     reads "$45" rather than "$45.00". */
   function money(cents) {
     var dollars = cents / 100;
     return '$' + dollars.toLocaleString('en-US', {
       minimumFractionDigits: dollars % 1 === 0 ? 0 : 2,
       maximumFractionDigits: 2
     });
+  }
+
+  /* Money about to be charged, or already charged. Always shows the cents —
+     a checkout total or a receipt reading "$45" looks like a rounding. */
+  function moneyExact(cents, currency) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: (currency || catalog.currency).toUpperCase()
+    }).format((cents || 0) / 100);
   }
 
   return {
@@ -222,6 +233,7 @@
     detailsFor: detailsFor,
     resolveLine: resolveLine,
     resolveCart: resolveCart,
-    money: money
+    money: money,
+    moneyExact: moneyExact
   };
 });

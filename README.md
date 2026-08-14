@@ -7,6 +7,7 @@ and no framework — plus two serverless functions that talk to Stripe.
 index.html            landing page
 gallery.html          the shop
 product.html          one work, read from ?work=<slug>
+checkout.html         Stripe's form, embedded in our own page
 thank-you.html        order confirmation, read from ?session_id=<id>
 
 assets/catalog.js     THE source of truth: works, prices, policies, shipping
@@ -92,9 +93,14 @@ the product page, the basket and the Stripe delivery estimate alike.
 
 1. Import the repository in Vercel. No framework preset, no build command —
    it serves the static files and turns `api/` into functions on its own.
-2. Add the environment variable **`STRIPE_SECRET_KEY`** in Project Settings →
-   Environment Variables. Use the test key (`sk_test_…`) first. It is only
-   ever read server-side; it must never be committed or appear in any page.
+2. Add two environment variables in Project Settings → Environment Variables:
+   - **`STRIPE_SECRET_KEY`** (`sk_…`) — only ever read server-side. Never
+     commit it, never let it reach a page.
+   - **`STRIPE_PUBLISHABLE_KEY`** (`pk_…`) — handed to the browser so the
+     embedded form can mount. Public by design.
+
+   Both must be from the same mode. A live secret with a test publishable key
+   fails at mount time with a confusing error. Use the test pair first.
 3. Deploy. `/api/checkout` and `/api/order` go live with the site.
 
 Optional: set `STRIPE_TAX=1` **only after** enabling Stripe Tax and adding
@@ -103,17 +109,42 @@ turning it on early makes every checkout session fail.
 
 ## How checkout works
 
-1. The browser posts identifiers only — `[{slug, sizeId, frameId, qty}]`. No
+1. "Proceed to checkout" sends the customer to `checkout.html`. Nothing is
+   passed in the URL — the basket is already in localStorage.
+2. That page posts identifiers only — `[{slug, sizeId, frameId, qty}]`. No
    prices leave the page.
-2. `api/checkout.js` resolves each line against the catalog, rejecting
-   unknown works and sold-out sizes, and computes the total itself.
-3. It creates a Stripe Checkout Session with the amounts built on the fly.
-4. The customer pays on Stripe's hosted page; Stripe sends the receipt.
-5. Stripe returns them to `thank-you.html?session_id=…`, which asks
-   `api/order.js` what was actually bought and shows it back to them.
+3. `api/checkout.js` resolves each line against the catalog, rejecting
+   unknown works and unavailable size/frame pairs, and computes the total
+   itself.
+4. It creates an **embedded** Checkout Session and returns the session's
+   client secret plus the publishable key.
+5. The page mounts Stripe's form inside itself, next to a read-only order
+   summary. The customer never leaves `compostela.press`.
+6. Stripe takes payment and sends its receipt, then returns them to
+   `thank-you.html?session_id=…`, which asks `api/order.js` what was
+   actually bought and shows it back to them.
 
-Because step 2 never trusts a number from the browser, a customer editing
+Because step 3 never trusts a number from the browser, a customer editing
 their local storage cannot change what they are charged.
+
+### Why embedded rather than a redirect
+
+The form is an iframe served by Stripe, so card details never touch this
+site and it stays in PCI SAQ A scope — the same as the old redirect. What
+changed is only where the frame sits.
+
+Its **interior** is styled from Stripe Dashboard → Settings → Branding
+(logo, colours, border radius, and a font from Stripe's list), not from
+`site.css`. Everything around it is ours.
+
+`checkout.html` fails closed, and never loses a basket:
+
+| what went wrong | what the customer sees |
+|---|---|
+| basket empty | "Your basket is empty" |
+| a line no longer sells | which line, and why |
+| `js.stripe.com` blocked by an extension | "Could not load the payment form" |
+| keys missing, or Stripe unreachable | "Checkout is unavailable right now" |
 
 ## The confirmation page
 
