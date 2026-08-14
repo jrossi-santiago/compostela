@@ -4,45 +4,26 @@
  * Session needs the secret key, and the secret key never leaves the server.
  * So the page asks this function, and this function returns a deliberately
  * narrow view of the order — enough to confirm it went through, and nothing
- * more.
+ * more. That view is built in api/_order.js, which the order emails read too,
+ * so the page and the emails cannot describe one order two ways.
  *
  * A session id is long and unguessable, and the customer has just been handed
  * theirs by Stripe, so possession of the id is what authorises the read. That
- * is the same basis Stripe's own hosted receipts use. It is also why the
- * response below carries no payment intent, no customer id, and no card
- * details beyond the brand and last four: anyone holding the link should be
- * able to see their order, and nothing that would help them do anything else.
+ * is the same basis Stripe's own hosted receipts use. It is also why the view
+ * carries no payment intent, no customer id, and no card details beyond the
+ * brand and last four: anyone holding the link should be able to see their
+ * order, and nothing that would help them do anything else.
+ *
+ * It is also the backstop for order email. api/webhook.js is what normally
+ * sends both emails; if it has not run — not configured yet, or still in
+ * Stripe's retry queue — a paid order being looked up here sends them instead.
+ * Whichever gets there first writes a marker into the session metadata, so an
+ * order is only ever emailed once.
  *
  * Requires the STRIPE_SECRET_KEY environment variable, set in Vercel.
  */
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
-// cs_test_… / cs_live_… — Stripe's own format. Anything else is not a session
-// id, and is refused before it reaches the API.
-const SESSION_ID = /^cs_[A-Za-z0-9_]{10,255}$/;
-
-function address(details) {
-  if (!details || !details.address) return null;
-  const a = details.address;
-  return {
-    name: details.name || null,
-    line1: a.line1 || null,
-    line2: a.line2 || null,
-    city: a.city || null,
-    state: a.state || null,
-    postalCode: a.postal_code || null,
-    country: a.country || null
-  };
-}
-
-/* Stripe moved shipping onto `collected_information` in newer API versions and
-   kept `shipping_details` on older ones. Read whichever this account returns
-   so the page does not depend on the pinned version. */
-function shippingDetails(session) {
-  return (session.collected_information && session.collected_information.shipping_details)
-    || session.shipping_details
-    || null;
-}
+const orders = require('./_order.js');
+const email = require('./_email.js');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -59,15 +40,13 @@ module.exports = async function handler(req, res) {
   }
 
   const sessionId = String((req.query && req.query.session_id) || '');
-  if (!SESSION_ID.test(sessionId)) {
+  if (!orders.SESSION_ID.test(sessionId)) {
     return res.status(400).json({ error: 'That is not an order reference we recognise.' });
   }
 
   let session;
   try {
-    session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['line_items.data.price.product', 'payment_intent.payment_method']
-    });
+    session = await orders.retrieve(sessionId);
   } catch (err) {
     if (err && err.code === 'resource_missing') {
       return res.status(404).json({ error: 'We could not find that order.' });
@@ -76,43 +55,18 @@ module.exports = async function handler(req, res) {
     return res.status(502).json({ error: 'Could not reach the payment provider.' });
   }
 
-  const totals = session.total_details || {};
-  const lineItems = (session.line_items && session.line_items.data) || [];
+  /* Only ever a catch-up, and only for an order that has actually been paid
+     for. `deliverOrderEmails` does not throw and does nothing at all if the
+     webhook has already been through, so the page is never held up by more
+     than the one check. Set ORDER_EMAILS_ON_LOOKUP=0 to leave it to the
+     webhook alone. */
+  if (orders.isPaid(session) && process.env.ORDER_EMAILS_ON_LOOKUP !== '0') {
+    const result = await email.deliverOrderEmails(session);
+    if (result.sent) {
+      console.log('Order emails sent from the confirmation page for ' +
+        orders.reference(sessionId) + ' — the webhook did not get there first.');
+    }
+  }
 
-  const card = session.payment_intent
-    && session.payment_intent.payment_method
-    && session.payment_intent.payment_method.card;
-
-  return res.status(200).json({
-    // 'complete' once the customer has paid; 'open' if they backed out
-    // mid-checkout and 'expired' if the session timed out.
-    status: session.status,
-    paymentStatus: session.payment_status,
-    paid: session.payment_status === 'paid' || session.payment_status === 'no_payment_required',
-    // The short form the customer sees, matching what we show on the page.
-    reference: sessionId.slice(-12).toUpperCase(),
-    placedAt: session.created ? session.created * 1000 : null,
-    email: (session.customer_details && session.customer_details.email) || null,
-    currency: session.currency,
-    amountSubtotal: session.amount_subtotal,
-    amountShipping: totals.amount_shipping || 0,
-    amountTax: totals.amount_tax || 0,
-    amountDiscount: totals.amount_discount || 0,
-    amountTotal: session.amount_total,
-    card: card ? { brand: card.brand, last4: card.last4 } : null,
-    shipping: address(shippingDetails(session)),
-    lines: lineItems.map((item) => {
-      const product = (item.price && item.price.product) || {};
-      const metadata = product.metadata || {};
-      return {
-        // "The Storm on the Sea of Galilee — Rembrandt"
-        name: product.name || item.description || 'Print',
-        // "Extra large — 24 × 36 in · Red oak frame"
-        detail: product.description || null,
-        slug: metadata.slug || null,
-        quantity: item.quantity,
-        amount: item.amount_total
-      };
-    })
-  });
+  return res.status(200).json(orders.view(session));
 };

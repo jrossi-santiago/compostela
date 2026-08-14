@@ -256,7 +256,7 @@
         }
         return '<div><span class="eyebrow">Delivery</span><p>' +
           ship.minDays + '&ndash;' + ship.maxDays + ' days from order to delivery.' + window_ +
-          ' We will write again when it is dispatched.</p></div>';
+          ' We will email you a tracking number as soon as it ships.</p></div>';
       }
 
       function renderOrder(order) {
@@ -330,7 +330,7 @@
           eyebrow.textContent = 'Order confirmed';
           headline.textContent = 'Thank you';
           lede.textContent = 'Your order went through and is being printed. ' +
-            'A receipt is on its way to your inbox, and the details are below.';
+            'A confirmation is on its way to your inbox, and the details are below.';
           renderOrder(order);
         })
         .catch(function (err) {
@@ -340,7 +340,7 @@
           eyebrow.textContent = 'Order received';
           headline.textContent = 'Thank you';
           lede.textContent = 'Your order is in. We could not load the full details ' +
-            'just now, but the receipt on its way to your inbox has them.';
+            'just now, but the confirmation on its way to your inbox has them.';
           showNotice('Reference <strong>' + esc(sessionId.slice(-12).toUpperCase()) +
             '</strong>' + (err && err.message ? ' &middot; <span class="muted">' + esc(err.message) + '</span>' : '') +
             '<br>Quote that reference if you need to write to us about this order.');
