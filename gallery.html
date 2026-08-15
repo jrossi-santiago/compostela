@@ -112,7 +112,7 @@
 
   .closing {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 40px;
     margin-top: 96px;
     padding-top: 40px;
@@ -202,14 +202,9 @@
 
     <section class="closing">
       <div>
-        <p class="eyebrow">Printing</p>
-        <h3>Cotton rag, printed to order</h3>
-        <!-- Filled from catalog.js so the specs are stated in one place only. -->
-        <p id="printingNote"></p>
-      </div>
-      <div>
         <p class="eyebrow">Framing</p>
         <h3>Black, white or red oak</h3>
+        <!-- Filled from catalog.js so the specs are stated in one place only. -->
         <p id="framingNote"></p>
       </div>
       <div>
@@ -238,7 +233,6 @@
     (function () {
       Shop.init();
 
-      document.getElementById('printingNote').textContent = Shop.catalog.policies.details;
       document.getElementById('framingNote').textContent = Shop.catalog.policies.framing;
 
       var grid = document.getElementById('grid');
