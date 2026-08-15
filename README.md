@@ -153,9 +153,14 @@ Every paid order sends two emails, both through [Resend](https://resend.com)
 over its REST API — there is no SDK to install, for the same reason there is no
 build step.
 
+Both are sent from **`orders@send.compostela.press`**. A subdomain rather than
+the bare domain on purpose: if order mail ever draws spam complaints, the
+reputation damage is confined to `send.` and leaves ordinary
+`compostela.press` mail alone. The subdomain has to stay verified in Resend.
+
 | | goes to | carries |
 |---|---|---|
-| **fulfilment alert** | `ORDER_ALERT_EMAIL` | everything needed to make and post the order: reference, customer, address, each piece with its size, frame and slug, the money, a copyable packing list, and a link to the payment in Stripe. Reply to it and you are writing to the customer. |
+| **internal order alert** | `josephrossi613@gmail.com` | everything needed to make and post the order: reference, customer, address, each piece with its size, frame and slug, the money, a copyable packing list, and a link to the payment in Stripe. Reply to it and you are writing to the customer. |
 | **confirmation** | the customer | what they bought, what it cost, where it is going, the delivery window in real dates, the print and returns terms, and that **a tracking number follows when it ships**. |
 
 Both are built in `api/_email.js` from the same order view the confirmation
@@ -185,11 +190,10 @@ again so the next attempt is a real one. No database is involved.
 ### Setting it up
 
 1. **Resend.** Create an API key and set `RESEND_API_KEY`.
-2. **A verified sender.** Until a domain is verified, Resend's shared sender
-   only delivers to your own Resend account address — the fulfilment alert will
-   arrive and customer confirmations will not. Verify your domain, then set
-   `ORDER_FROM` to an address on it. This is the one step that cannot be
-   skipped before taking real orders.
+2. **The sending domain.** `send.compostela.press` must be verified in Resend —
+   Domains → Add Domain, then add the MX and TXT records it gives you to the
+   DNS for `compostela.press`. Until it verifies, Resend refuses every send and
+   no order email goes out at all.
 3. **The webhook.** In Stripe: Developers → Webhooks → add
    `https://<your-domain>/api/webhook`, subscribed to
    `checkout.session.completed` and `checkout.session.async_payment_succeeded`.

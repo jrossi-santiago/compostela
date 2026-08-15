@@ -42,12 +42,16 @@ function alertTo() {
   return process.env.ORDER_ALERT_EMAIL || 'josephrossi613@gmail.com';
 }
 
-/* Resend will not send from a domain it has not verified. Its shared sender
-   works out of the box but only delivers to the Resend account's own address —
-   enough for the alert, not enough for customers. Set ORDER_FROM to an address
-   on your verified domain before taking real orders. */
+/* Both emails are sent from the press's own address, on the subdomain verified
+   in Resend. A subdomain rather than the bare domain on purpose: if order mail
+   ever draws spam complaints, the reputation damage is confined to send. and
+   leaves ordinary compostela.press mail alone.
+
+   Resend refuses to send from a domain it has not verified, so if this ever
+   changes it has to be changed in Resend first. ORDER_FROM overrides it
+   without a deploy. */
 function from() {
-  return process.env.ORDER_FROM || 'Compostela <onboarding@resend.dev>';
+  return process.env.ORDER_FROM || 'Compostela <orders@send.compostela.press>';
 }
 
 /* The address a customer's reply should reach. Left unset, replies go to the
