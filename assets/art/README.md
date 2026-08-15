@@ -26,6 +26,11 @@ partially filled folder.
   than cropping it, so any aspect ratio sits correctly.
 - **Background** — if the source has a white border, trim it. The plate
   supplies its own mat.
+- **Shape** — the work has to be a rectangle. A tondo, an arched fresco or
+  a gothic altarpiece cannot be trimmed to its own edges, so it arrives
+  sitting on a white ground that reads as a mistake against the plate and
+  cannot be printed to any of the sizes on offer. Those works are out of
+  the catalog regardless of how good the scan is.
 
 ## Sourcing
 
@@ -50,7 +55,6 @@ this list; its source was not recorded.
 | Slug | Commons file | Licence |
 | --- | --- | --- |
 | `the-annunciation` | La Anunciación, by Fra Angelico, from Prado in Google Earth - main panel.jpg | Public domain |
-| `madonna-of-the-magnificat` | Magnificat Madonna - Botticelli (uffici) b.jpg | Public domain |
 | `the-immaculate-conception` | Murillo immaculate conception.jpg | Public domain |
 | `the-calling-of-saint-matthew` | Caravaggio — The Calling of Saint Matthew.jpg | CC0 |
 | `saint-francis-in-meditation` | Francisco de Zurbarán 053.jpg | Public domain |
@@ -59,8 +63,6 @@ this list; its source was not recorded.
 | `the-transfiguration` | Transfiguration Raphael.jpg | Public domain |
 | `the-return-of-the-prodigal-son` | Rembrandt Harmensz. van Rijn - The Return of the Prodigal Son.jpg | Public domain |
 | `the-supper-at-emmaus` | 1602-3 Caravaggio,Supper at Emmaus National Gallery, London.jpg | Public domain |
-| `the-disputation-of-the-holy-sacrament` | Raffael 078.jpg | Public domain |
-| `the-adoration-of-the-magi` | Gentile da Fabriano - Adorazione dei Magi - Google Art ProjectFXD.jpg | Public domain |
 
 One caveat for the print lab rather than the site: `the-transfiguration` is
 1067 × 1608, the largest public-domain scan Commons carries of it. That is

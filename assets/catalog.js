@@ -160,18 +160,6 @@
       description: 'Fra Angelico painted the Annunciation more than once, and each time with the same restraint: an empty portico, two figures bent toward one another, gold laid down like light rather than ornament. Printed warm, it reads as morning in a room rather than a scene behind glass.'
     },
     {
-      slug: 'madonna-of-the-magnificat',
-      title: 'Madonna of the Magnificat',
-      artist: 'Sandro Botticelli',
-      year: '1481',
-      medium: 'Tempera on panel',
-      collection: 'marian',
-      prices: priceLadder.standard,
-      featured: true,
-      blurb: 'The Virgin writing her own canticle, circled by angels and a crown of light.',
-      description: 'A tondo — a painting in the round — of Our Lady setting down the Magnificat while the Child steadies her hand. Botticelli gives the whole thing a circular pull, so the eye never quite settles. It hangs well over a desk or anywhere writing gets done.'
-    },
-    {
       slug: 'the-immaculate-conception',
       title: 'The Immaculate Conception',
       artist: 'Bartolomé Esteban Murillo',
@@ -261,28 +249,6 @@
       prices: priceLadder.standard,
       blurb: 'The instant of recognition, at a table set with ordinary supper.',
       description: 'Bread broken at an inn, and two disciples who suddenly know who is sitting with them. Caravaggio pushes the basket to the edge of the table so it seems about to fall into the room — the viewer is meant to be at that table, not looking at it.'
-    },
-    {
-      slug: 'the-disputation-of-the-holy-sacrament',
-      title: 'The Disputation of the Holy Sacrament',
-      artist: 'Raphael',
-      year: '1509–1510',
-      medium: 'Fresco',
-      collection: 'sacraments',
-      prices: priceLadder.large,
-      blurb: 'Heaven and the doctors of the Church, arranged around a monstrance.',
-      description: 'Painted for the Stanza della Segnatura, opposite the School of Athens. Everything on the wall — saints, popes, theologians, the Trinity in a vertical axis — is organized around the Host on the altar. A picture that argues by composition.'
-    },
-    {
-      slug: 'the-adoration-of-the-magi',
-      title: 'The Adoration of the Magi',
-      artist: 'Gentile da Fabriano',
-      year: '1423',
-      medium: 'Tempera on panel',
-      collection: 'marian',
-      prices: priceLadder.standard,
-      blurb: 'Gold ground, a long procession, and the last stretch of a very long road.',
-      description: 'The high point of the International Gothic — tooled gold, brocade, animals worked in at the edges, and the whole journey folded into the background hills. Printed warm, the gold reads as candlelight rather than metal.'
     }
   ];
 
