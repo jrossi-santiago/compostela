@@ -17,7 +17,13 @@ assets/art/<slug>.jpg artwork, named after the slug
 
 api/checkout.js       creates the Stripe Checkout Session
 api/order.js          reads one back, for the confirmation page
+api/webhook.js        Stripe says an order is paid; the emails go out
+api/_order.js         reading a session back — shared, not a route
+api/_email.js         the two order emails, and sending them once
 ```
+
+Files in `api/` beginning with `_` are shared modules, not endpoints — Vercel
+does not turn them into functions.
 
 ## The one-place rule
 
@@ -108,9 +114,11 @@ turning it on early makes every checkout session fail.
 2. `api/checkout.js` resolves each line against the catalog, rejecting
    unknown works and sold-out sizes, and computes the total itself.
 3. It creates a Stripe Checkout Session with the amounts built on the fly.
-4. The customer pays on Stripe's hosted page; Stripe sends the receipt.
+4. The customer pays on Stripe's hosted page.
 5. Stripe returns them to `thank-you.html?session_id=…`, which asks
    `api/order.js` what was actually bought and shows it back to them.
+6. Stripe also calls `api/webhook.js`, which emails the order to the press and
+   a confirmation to the customer. See **Order email** below.
 
 Because step 2 never trusts a number from the browser, a customer editing
 their local storage cannot change what they are charged.
@@ -139,8 +147,65 @@ The basket is only ever emptied once Stripe has confirmed payment. Clearing it
 on arrival would throw away a live basket whenever a lookup hiccuped or someone
 opened the page by accident.
 
-Orders appear in the Stripe dashboard. Nothing automates fulfilment yet — a
-webhook to a print lab would be the next piece.
+## Order email
+
+Every paid order sends two emails, both through [Resend](https://resend.com)
+over its REST API — there is no SDK to install, for the same reason there is no
+build step.
+
+Both are sent from **`orders@send.compostela.press`**. A subdomain rather than
+the bare domain on purpose: if order mail ever draws spam complaints, the
+reputation damage is confined to `send.` and leaves ordinary
+`compostela.press` mail alone. The subdomain has to stay verified in Resend.
+
+| | goes to | carries |
+|---|---|---|
+| **internal order alert** | `josephrossi613@gmail.com` | everything needed to make and post the order: reference, customer, address, each piece with its size, frame and slug, the money, a copyable packing list, and a link to the payment in Stripe. Reply to it and you are writing to the customer. |
+| **confirmation** | the customer | what they bought, what it cost, where it is going, the delivery window in real dates, the print and returns terms, and that **a tracking number follows when it ships**. |
+
+Both are built in `api/_email.js` from the same order view the confirmation
+page uses, so the page and the emails cannot describe one order two ways. Every
+word of policy in them — print spec, framing, shipping, returns, the 7–10 day
+window — is read from `catalog.policies` and `catalog.shipping` rather than
+written a second time.
+
+### What sends them
+
+`api/webhook.js` is the reliable path: Stripe reports the payment and keeps
+reporting it until the endpoint answers 2xx, whether or not the customer's
+browser ever comes back. Nothing in the request body is trusted for the order's
+contents — the session id is taken from the event and the order is read back
+from Stripe with the secret key.
+
+`api/order.js` is the backstop. If someone lands on the confirmation page and
+the webhook has not been through — not set up yet, or still in Stripe's retry
+queue — the lookup sends the emails itself.
+
+Both routes go through one function, which claims the order by writing
+`orderEmailsAt` into the session's metadata *before* sending. Whoever claims it
+first is the one that sends, so a webhook retry, a page reload and a
+double-delivery all cost nothing. If nothing goes out, the claim is dropped
+again so the next attempt is a real one. No database is involved.
+
+### Setting it up
+
+1. **Resend.** Create an API key and set `RESEND_API_KEY`.
+2. **The sending domain.** `send.compostela.press` must be verified in Resend —
+   Domains → Add Domain, then add the MX and TXT records it gives you to the
+   DNS for `compostela.press`. Until it verifies, Resend refuses every send and
+   no order email goes out at all.
+3. **The webhook.** In Stripe: Developers → Webhooks → add
+   `https://<your-domain>/api/webhook`, subscribed to
+   `checkout.session.completed` and `checkout.session.async_payment_succeeded`.
+   Copy the signing secret into `STRIPE_WEBHOOK_SECRET`. Test mode and live
+   mode have separate endpoints and separate secrets.
+
+`STRIPE_WEBHOOK_SECRET` is required, not optional: an unverified webhook
+endpoint is a send button for strangers, so without it every delivery is
+refused. The remaining variables are documented in `.env.example`.
+
+Orders also appear in the Stripe dashboard as they always did. Fulfilment
+itself is still by hand — a hand-off to a print lab would be the next piece.
 
 ## Running locally
 
