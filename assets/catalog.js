@@ -19,25 +19,19 @@
   }
 })(typeof self !== 'undefined' ? self : this, function () {
 
-  /* =========================================================================
-   * ⚠ NOT YET CONFIRMED — `standard` and `large` below are placeholders.
-   * `confirmed` is the real ladder, settled for The Storm on the Sea of
-   * Galilee and since applied to every work added after it. Replace the
-   * other two before taking an order for anything still on them.
-   * ======================================================================= */
-
-  // Prices in integer cents. 4500 === $45.00. Never use decimals here.
+  /* One ladder, and every work is on it. The catalog is priced as a single
+   * shelf rather than by artist, size of the original, or anything else —
+   * a print costs what a print costs.
+   *
+   * These are the figures settled for The Storm on the Sea of Galilee.
+   * Framed totals come out at $35.99 / $59.99 / $99.99 once framePrices is
+   * added on. Editing the four numbers below reprices the whole catalog.
+   *
+   * Prices in integer cents. 4500 === $45.00. Never use decimals here.
+   */
   var priceLadder = {
-    // Framed totals come out at $35.99 / $59.99 / $99.99 once framePrices
-    // is added on.
-    confirmed: { '5x7': 999, '8x10': 1599, '18x24': 1999, '24x36': 2999 },
-    standard:  { '5x7': 2500, '8x10': 4500, '18x24': 9500, '24x36': 16500 },
-    large:     { '5x7': 3000, '8x10': 5500, '18x24': 11500, '24x36': 18500 }
+    confirmed: { '5x7': 999, '8x10': 1599, '18x24': 1999, '24x36': 2999 }
   };
-
-  /* =========================================================================
-   * End of the unconfirmed block. Everything below is confirmed or structure.
-   * ======================================================================= */
 
   /* Framing add-on, in cents, by size. It is charged on top of the print
    * price, so a framed 8 × 10 of a $15.99 print comes to $35.99.
@@ -128,7 +122,9 @@
 
   /* Per-work fields:
    *   slug        file name in assets/art/, and the ?work= URL
-   *   prices      a price ladder, or an inline { sm, md, lg } of your own
+   *   prices      priceLadder.confirmed on every work — the catalog is
+   *               priced as one shelf. An inline map of the four size ids
+   *               is still honoured if a work ever has to differ.
    *   soldOut     array of size ids that are unavailable, e.g. ['24x36']
    *   featured    surfaces first under the default gallery sort
    *   blurb       one line, used for the page's meta description
@@ -155,7 +151,7 @@
       year: 'c. 1426',
       medium: 'Tempera on panel',
       collection: 'marian',
-      prices: priceLadder.standard,
+      prices: priceLadder.confirmed,
       featured: true,
       blurb: 'The angel and the Virgin under a quiet loggia — the moment the whole story turns on.',
       description: 'Fra Angelico painted the Annunciation more than once, and each time with the same restraint: an empty portico, two figures bent toward one another, gold laid down like light rather than ornament. Printed warm, it reads as morning in a room rather than a scene behind glass.'
@@ -167,7 +163,7 @@
       year: 'c. 1678',
       medium: 'Oil on canvas',
       collection: 'marian',
-      prices: priceLadder.large,
+      prices: priceLadder.confirmed,
       blurb: 'Murillo’s Virgin, standing on the moon in a wash of Spanish light.',
       description: 'Murillo returned to this subject for most of his working life. The version printed here is the late one: blue and white against a warm gold ground, the figure lifted on cloud and cherub. It carries a room on its own and needs very little around it.'
     },
@@ -178,7 +174,7 @@
       year: '1600',
       medium: 'Oil on canvas',
       collection: 'saints',
-      prices: priceLadder.large,
+      prices: priceLadder.confirmed,
       featured: true,
       blurb: 'A shaft of light across a counting table, and a man asked to leave it.',
       description: 'Caravaggio put the calling in a tax office and lit it like a raid. The gesture at the center is deliberately ambiguous — Matthew may be pointing at himself, or at the man beside him — which is most of the reason the painting has held for four centuries.'
@@ -190,7 +186,7 @@
       year: 'c. 1635',
       medium: 'Oil on canvas',
       collection: 'saints',
-      prices: priceLadder.standard,
+      prices: priceLadder.confirmed,
       blurb: 'Coarse habit, folded hands, and nearly nothing else.',
       description: 'Zurbarán strips the scene to a kneeling figure and a skull, the habit painted with more attention than the face. It is a picture about attention itself — an argument for the plain room, made in paint.'
     },
@@ -201,7 +197,7 @@
       year: 'c. 1605',
       medium: 'Oil on canvas',
       collection: 'saints',
-      prices: priceLadder.standard,
+      prices: priceLadder.confirmed,
       blurb: 'The translator at work, reaching across the table for the next line.',
       description: 'Jerome bent over the Vulgate, arm extended, red cloth falling off the shoulder. Caravaggio paints the labor rather than the halo. A study for anyone whose work is done at a desk.'
     },
@@ -212,7 +208,7 @@
       year: 'c. 1632',
       medium: 'Oil on canvas',
       collection: 'passion',
-      prices: priceLadder.large,
+      prices: priceLadder.confirmed,
       featured: true,
       blurb: 'The figure alone against black, hair fallen across the face.',
       description: 'Velázquez gives no crowd, no landscape, no weather — only the body and the dark behind it. The restraint is the point. Printed large, it becomes the still center of a hallway or a chapel corner.'
@@ -224,7 +220,7 @@
       year: '1516–1520',
       medium: 'Oil on wood',
       collection: 'passion',
-      prices: priceLadder.large,
+      prices: priceLadder.confirmed,
       blurb: 'Raphael’s last painting: glory above, and a crowd below that cannot heal anyone.',
       description: 'Two registers held in one frame — the mountain lit white, the confusion at its foot. Raphael was still working on it when he died, and it hung above him at his funeral. The lower half is why it is a great painting and not merely a beautiful one.'
     },
@@ -235,7 +231,7 @@
       year: 'c. 1668',
       medium: 'Oil on canvas',
       collection: 'sacraments',
-      prices: priceLadder.large,
+      prices: priceLadder.confirmed,
       featured: true,
       blurb: 'Two hands on a ruined son’s back — the whole of confession in one gesture.',
       description: 'Late Rembrandt, painted in the last year or so of his life. The son’s shoes are worn through; the father’s hands are not identical, and generations of writers have argued about why. Whatever the answer, the picture is about being received back.'
@@ -247,7 +243,7 @@
       year: '1601',
       medium: 'Oil on canvas',
       collection: 'sacraments',
-      prices: priceLadder.standard,
+      prices: priceLadder.confirmed,
       blurb: 'The instant of recognition, at a table set with ordinary supper.',
       description: 'Bread broken at an inn, and two disciples who suddenly know who is sitting with them. Caravaggio pushes the basket to the edge of the table so it seems about to fall into the room — the viewer is meant to be at that table, not looking at it.'
     },
