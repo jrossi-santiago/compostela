@@ -59,12 +59,15 @@
   // Written once, here.
   var policies = {
     details:
-      'Archival pigment print on 310gsm cotton rag, matte finish. Printed to ' +
-      'order. Borders sized for framing without trimming.',
+      'Printed to order on 189gsm matte paper, 0.26mm thick, with ' +
+      'water-based inks. Matte throughout, so it holds up under a lamp ' +
+      'without throwing the room back at you.',
     framing:
-      'Frames are made to the print’s dimensions in black, white or red oak, ' +
-      'glazed with UV-filtering acrylic and delivered wired and ready to ' +
-      'hang. The smallest size is sold as a print only.',
+      'Frames are ayous wood from renewable forests, 1.9cm thick, in ' +
+      'black, white or red oak. The front is acrylic rather than glass — ' +
+      'lighter on the wall, and it will not shatter on the way to you. ' +
+      'Hanging hardware is in the box, fitted by you rather than by us. ' +
+      'The smallest size is sold as a print only.',
     shipping: [
       'Seven to ten days from order to delivery. Prints are made when you order, so the first few of those days are spent at the press.',
       'Unframed prints ship rolled in a rigid tube; framed pieces ship boxed and corner-protected.',
