@@ -24,7 +24,8 @@ partially filled folder.
   the product page's zoom view is capped by the viewport anyway.
 - **Crop** — none. Include the full work; the plate mats the image rather
   than cropping it, so any aspect ratio sits correctly.
-- **Background** — if the source has a white border, trim it. The plate
+- **Background** — if the source has a white border, trim it. Some museum
+  photography uses a flat black backdrop instead; trim that too. The plate
   supplies its own mat.
 - **Shape** — the work has to be a rectangle. A tondo, an arched fresco or
   a gothic altarpiece cannot be trimmed to its own edges, so it arrives
@@ -63,6 +64,18 @@ this list; its source was not recorded.
 | `the-transfiguration` | Transfiguration Raphael.jpg | Public domain |
 | `the-return-of-the-prodigal-son` | Rembrandt Harmensz. van Rijn - The Return of the Prodigal Son.jpg | Public domain |
 | `the-supper-at-emmaus` | 1602-3 Caravaggio,Supper at Emmaus National Gallery, London.jpg | Public domain |
+| `landscape-with-the-rest-on-the-flight-into-egypt` | Claude Lorrain 018.jpg | Public domain |
+| `landscape-with-saint-george-and-the-dragon` | Claude Lorrain San Jorge.jpg | Public domain |
+| `saint-francis-in-the-desert` | Giovanni Bellini - Saint Francis in the Desert - Google Art Project.jpg | Public domain |
+| `saint-catherine-of-alexandria` | Raffael-katharina-alexandria.jpg | Public domain |
+| `saint-joseph-and-the-christ-child` | Guido Reni - Saint Joseph and the Christ Child - 96.1565 - Museum of Fine Arts.jpg | Public domain |
+| `salus-populi-romani` | Salus Populi Romani after restoration.jpg | Public domain |
+| `the-apostle-paul` | Rembrandt, The Apostle Paul, 1659, The National Gallery, London.jpg | Public domain |
+| `saint-bartholomew` | Rembrandt Harmensz. van Rijn (Dutch - St. Bartholomew) - Google Art Project.jpg | Public domain |
+| `head-of-christ` | Rembrandt Harmensz. van Rijn 048.jpg | Public domain |
+| `saint-casilda` | Francisco de Zurbarán - Santa Casilda.jpg | Public domain |
+| `saint-andrew` | José de Ribera 028.jpg | Public domain |
+| `saint-joseph-the-carpenter` | Saint Joseph charpentier (La Tour).jpg | Public domain |
 
 One caveat for the print lab rather than the site: `the-transfiguration` is
 1067 × 1608, the largest public-domain scan Commons carries of it. That is
